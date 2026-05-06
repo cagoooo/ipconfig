@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 # 中平國小網路狀態監控腳本（Windows PowerShell）
 # 用途：定時 ping/HTTP 探測 targets.json 內的目標，產生 status.json
 #       與 history.json，並 git push 到 GitHub Pages
@@ -179,20 +179,26 @@ try {
     # ----------------------------------------
     Push-Location $RepoDir
     try {
-        & git add status.json history.json 2>&1 | Out-Null
-        $statusOutput = & git status --porcelain
+        # 暫時改回 Continue 模式，避免 native 指令 stderr 被當錯誤
+        $prevPref = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+
+        & git add status.json history.json | Out-Null
+        $statusOutput = (& git status --porcelain) -join "`n"
         if ([string]::IsNullOrWhiteSpace($statusOutput)) {
             Write-Log "沒有檔案變更，跳過 commit"
         } else {
             $commitMsg = "monitor: $timestamp"
-            & git commit -m $commitMsg 2>&1 | Out-Null
-            & git push 2>&1 | Out-Null
+            & git commit -m $commitMsg --quiet
+            & git push --quiet
             if ($LASTEXITCODE -eq 0) {
                 Write-Log "已 push 到 GitHub"
             } else {
                 Write-Log "git push 失敗（exit $LASTEXITCODE）"
             }
         }
+
+        $ErrorActionPreference = $prevPref
     } finally {
         Pop-Location
     }
