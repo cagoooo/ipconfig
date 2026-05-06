@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>中平國小網路狀態儀表板</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏠%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #f7f1e8;
+    --card: #fffdf8;
+    --card-border: #ece2cf;
+    --ink: #4a3f2f;
+    --ink-soft: #8a7c66;
+    --shadow: 0 2px 6px rgba(150, 120, 80, 0.08), 0 8px 24px rgba(150, 120, 80, 0.06);
+    --green: #5cb85c;
+    --green-soft: #e8f5e9;
+    --yellow: #f0ad4e;
+    --yellow-soft: #fff4e0;
+    --red: #d9534f;
+    --red-soft: #fdecea;
+    --gray: #b6aa95;
+    --row-alt: #fbf6ec;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    font-family: "Segoe UI", "Microsoft JhengHei", "PingFang TC", -apple-system, sans-serif;
+    color: var(--ink);
+    line-height: 1.55;
+  }
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 20px 64px;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 2px dashed var(--card-border);
+  }
+  header h1 {
+    font-size: 28px;
+    margin: 0 0 6px;
+    letter-spacing: 1px;
+  }
+  header .subtitle {
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+  header .meta {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  header .meta strong { color: var(--ink); }
+
+  section.group { margin-bottom: 26px; }
+  section.group h2 {
+    font-size: 16px;
+    margin: 0 0 12px 4px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 18px 16px 20px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(150,120,80,0.12), 0 12px 28px rgba(150,120,80,0.10);
+  }
+  .card .name {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .card .host {
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    font-family: "Consolas", "Menlo", monospace;
+    word-break: break-all;
+  }
+  .ball {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.6), 0 4px 10px rgba(0,0,0,0.08);
+    background: radial-gradient(circle at 30% 25%, #fff8 0%, transparent 45%), var(--gray);
+  }
+  .ball.green   { background: radial-gradient(circle at 30% 25%, #fff8 0%, transparent 45%), var(--green); }
+  .ball.yellow  { background: radial-gradient(circle at 30% 25%, #fff8 0%, transparent 45%), var(--yellow); }
+  .ball.red     { background: radial-gradient(circle at 30% 25%, #fff8 0%, transparent 45%), var(--red); }
+  .latency {
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .latency strong { color: var(--ink); font-size: 15px; }
+
+  /* 歷史紀錄表格 */
+  .history-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 18px 16px;
+    box-shadow: var(--shadow);
+    margin-top: 24px;
+    overflow-x: auto;
+  }
+  .history-card h2 {
+    font-size: 16px;
+    margin: 0 0 14px 4px;
+  }
+  table.history {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 700px;
+  }
+  table.history th {
+    text-align: left;
+    padding: 10px 12px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    border-bottom: 1px solid var(--card-border);
+    white-space: nowrap;
+  }
+  table.history td {
+    padding: 10px 12px;
+    border-bottom: 1px dashed var(--card-border);
+    white-space: nowrap;
+  }
+  table.history tr:nth-child(even) td { background: var(--row-alt); }
+  .time-chip {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #ece4d3;
+    border-radius: 6px;
+    font-family: "Consolas", "Menlo", monospace;
+    font-size: 12px;
+    color: var(--ink);
+  }
+  .dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+    background: var(--gray);
+  }
+  .dot.green  { background: var(--green); }
+  .dot.yellow { background: var(--yellow); }
+  .dot.red    { background: var(--red); }
+  .ms-na { color: var(--red); font-weight: 600; }
+
+  footer {
+    margin-top: 40px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 13px;
+    padding-top: 18px;
+    border-top: 2px dashed var(--card-border);
+  }
+  footer a {
+    color: #c97a3e;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  footer a:hover { text-decoration: underline; }
+
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ink-soft);
+    background: var(--card);
+    border-radius: 14px;
+    border: 1px dashed var(--card-border);
+  }
+  @media (max-width: 600px) {
+    header h1 { font-size: 22px; }
+    .cards { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    .ball { width: 38px; height: 38px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="pageTitle">🏠 中平國小網路狀態儀表板</h1>
+    <div class="subtitle" id="pageSubtitle">校園網路即時監控（每 5 分鐘自動更新）</div>
+    <div class="meta">最後更新：<strong id="lastUpdate">—</strong></div>
+  </header>
+
+  <main id="main">
+    <div class="empty" id="emptyMsg">⏳ 載入中…</div>
+  </main>
+
+  <footer>
+    Made with ❤️ by
+    <a href="https://sites.google.com/mail2.smes.tyc.edu.tw/akai" target="_blank" rel="noopener">阿凱老師</a>
+    　·
+    資料來源：<a href="https://github.com/cagoooo/ipconfig" target="_blank" rel="noopener">github.com/cagoooo/ipconfig</a>
+  </footer>
+</div>
+
+<script>
+  const REFRESH_MS = 60 * 1000;
+  let thresholds = { greenMaxMs: 100, yellowMaxMs: 300, yellowMaxLossPercent: 30 };
+
+  function classify(entry) {
+    if (!entry || !entry.ok) return 'red';
+    const ms = entry.avgMs;
+    const loss = entry.lossPercent || 0;
+    if (loss >= 50) return 'red';
+    if (ms === null || ms === undefined) return 'red';
+    if (ms <= thresholds.greenMaxMs && loss === 0) return 'green';
+    if (ms <= thresholds.yellowMaxMs && loss <= thresholds.yellowMaxLossPercent) return 'yellow';
+    return 'red';
+  }
+
+  function fmtMs(ms) {
+    if (ms === null || ms === undefined) return '—';
+    return ms.toFixed(ms < 10 ? 2 : 1) + 'ms';
+  }
+
+  async function fetchJson(path) {
+    const url = path + '?t=' + Date.now();
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error(path + ' ' + r.status);
+    return r.json();
+  }
+
+  function renderStatus(snapshot, config) {
+    const main = document.getElementById('main');
+    main.innerHTML = '';
+    if (!snapshot || !snapshot.results || snapshot.results.length === 0) {
+      main.innerHTML = '<div class="empty">尚無檢測資料</div>';
+      return;
+    }
+
+    document.getElementById('lastUpdate').textContent = snapshot.timestamp || '—';
+
+    // 分組顯示
+    const groupsMap = new Map();
+    snapshot.results.forEach(r => {
+      const key = r.groupName || 'default';
+      if (!groupsMap.has(key)) {
+        groupsMap.set(key, { label: r.groupLabel || key, items: [] });
+      }
+      groupsMap.get(key).items.push(r);
+    });
+
+    groupsMap.forEach((group) => {
+      const section = document.createElement('section');
+      section.className = 'group';
+      const h = document.createElement('h2');
+      h.textContent = group.label;
+      section.appendChild(h);
+
+      const grid = document.createElement('div');
+      grid.className = 'cards';
+
+      group.items.forEach(item => {
+        const cls = classify(item);
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="name">${escapeHtml(item.name)}</div>
+          <div class="host">${escapeHtml(item.host)}</div>
+          <span class="ball ${cls}"></span>
+          <div class="latency">
+            ${item.ok
+              ? `延遲 <strong>${fmtMs(item.avgMs)}</strong>`
+              : `<span class="ms-na">⚠ 無回應</span>`}
+            ${item.lossPercent > 0 && item.lossPercent < 100 ? ` · 丟包 ${item.lossPercent}%` : ''}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      section.appendChild(grid);
+      main.appendChild(section);
+    });
+  }
+
+  function renderHistory(history, snapshot) {
+    if (!history || history.length === 0) return;
+
+    // 用最新 snapshot 的 results 順序作為欄位
+    const cols = snapshot.results.map(r => ({ groupName: r.groupName, name: r.name }));
+
+    const container = document.createElement('div');
+    container.className = 'history-card';
+    const h = document.createElement('h2');
+    h.textContent = '📊 最近 10 次檢測詳細數據（延遲 ms）';
+    container.appendChild(h);
+
+    const table = document.createElement('table');
+    table.className = 'history';
+    const thead = document.createElement('thead');
+    const trh = document.createElement('tr');
+    trh.innerHTML = '<th>檢測時間</th>' + cols.map(c => `<th>${escapeHtml(c.name)}</th>`).join('');
+    thead.appendChild(trh);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    history.slice(0, 10).forEach(snap => {
+      const tr = document.createElement('tr');
+      const time = (snap.timeLabel || (snap.timestamp || '').slice(11, 19)) || '—';
+      let html = `<td><span class="time-chip">${escapeHtml(time)}</span></td>`;
+      cols.forEach(col => {
+        const r = (snap.results || []).find(x => x.groupName === col.groupName && x.name === col.name);
+        if (!r) {
+          html += '<td>—</td>';
+        } else {
+          const cls = classify(r);
+          const text = r.ok ? fmtMs(r.avgMs) : '無回應';
+          html += `<td><span class="dot ${cls}"></span>${escapeHtml(text)}</td>`;
+        }
+      });
+      tr.innerHTML = html;
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    container.appendChild(table);
+    document.getElementById('main').appendChild(container);
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  async function load() {
+    try {
+      const [config, status, history] = await Promise.allSettled([
+        fetchJson('targets.json'),
+        fetchJson('status.json'),
+        fetchJson('history.json')
+      ]);
+
+      if (config.status === 'fulfilled') {
+        const c = config.value;
+        if (c.title) document.getElementById('pageTitle').textContent = '🏠 ' + c.title;
+        if (c.subtitle) document.getElementById('pageSubtitle').textContent = c.subtitle;
+        if (c.thresholds) thresholds = Object.assign(thresholds, c.thresholds);
+        document.title = c.title || document.title;
+      }
+
+      if (status.status !== 'fulfilled') {
+        document.getElementById('main').innerHTML =
+          '<div class="empty">⚠ 尚未產生 status.json，請等待第一次檢測完成</div>';
+        return;
+      }
+
+      renderStatus(status.value, config.value || {});
+      if (history.status === 'fulfilled') {
+        renderHistory(history.value, status.value);
+      }
+    } catch (err) {
+      console.error(err);
+      document.getElementById('main').innerHTML =
+        '<div class="empty">⚠ 載入失敗：' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  load();
+  setInterval(load, REFRESH_MS);
+</script>
+</body>
+</html>

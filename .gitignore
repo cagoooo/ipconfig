@@ -1,0 +1,17 @@
+# 本機執行日誌（不上傳）
+monitor.log
+
+# Claude Code 本機設定（含權限白名單）
+.claude/
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# 暫存
+*.tmp
+*.bak
