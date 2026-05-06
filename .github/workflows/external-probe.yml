@@ -34,12 +34,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if git diff --quiet external-status.json 2>/dev/null; then
+          # 先 stage 起來；新檔 git diff 看不見，必須用 --cached
+          git add external-status.json
+
+          if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
           fi
 
-          git add external-status.json
           git commit -m "external: $(date -u '+%Y-%m-%dT%H:%M:%SZ') [skip ci]"
 
           for i in 1 2 3; do
