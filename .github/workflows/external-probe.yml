@@ -34,23 +34,33 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # 先 stage 起來；新檔 git diff 看不見，必須用 --cached
-          git add external-status.json
-
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-            exit 0
-          fi
-
-          git commit -m "external: $(date -u '+%Y-%m-%dT%H:%M:%SZ') [skip ci]"
-
+          # external-status.json 是每跑一次重新生成的檔案，不需要 merge 邏輯。
+          # 若有衝突，永遠以這次跑的結果為準。
+          # 做法：每次重試都 fetch 最新 origin，soft-reset 過去，重新 commit 一筆乾淨的，再 push。
           for i in 1 2 3; do
-            if git pull --rebase origin main && git push; then
+            git fetch origin main
+
+            # 如果 HEAD 已偏離 origin/main（先前迭代的失敗 commit），soft reset 回去保留檔案變更
+            if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+              git reset --soft origin/main
+            fi
+
+            git add external-status.json
+
+            if git diff --cached --quiet; then
+              echo "No changes to commit"
+              exit 0
+            fi
+
+            git commit -m "external: $(date -u '+%Y-%m-%dT%H:%M:%SZ') [skip ci]"
+
+            if git push; then
               echo "Pushed on attempt $i"
               exit 0
             fi
+
             echo "Push failed on attempt $i, retrying..."
-            sleep 5
+            sleep $((i * 3))
           done
 
           echo "Push failed after 3 attempts"
