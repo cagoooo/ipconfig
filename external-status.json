@@ -1,0 +1,118 @@
+{
+  "timestamp": "2026-05-06T08:03:47.330Z",
+  "timeLabel": "16:03:47",
+  "source": "github-actions-runner",
+  "note": "外部視角（GitHub Actions ubuntu runner）— 已排除內網 IP",
+  "results": [
+    {
+      "groupName": "DNS",
+      "groupLabel": "🌐 DNS 服務",
+      "name": "Google DNS",
+      "host": "8.8.8.8",
+      "type": "ping",
+      "ok": false,
+      "avgMs": null,
+      "lossPercent": 100
+    },
+    {
+      "groupName": "DNS",
+      "groupLabel": "🌐 DNS 服務",
+      "name": "Cloudflare DNS",
+      "host": "1.1.1.1",
+      "type": "ping",
+      "ok": false,
+      "avgMs": null,
+      "lossPercent": 100
+    },
+    {
+      "groupName": "DNS",
+      "groupLabel": "🌐 DNS 服務",
+      "name": "HINET DNS",
+      "host": "168.95.1.1",
+      "type": "ping",
+      "ok": false,
+      "avgMs": null,
+      "lossPercent": 100
+    },
+    {
+      "groupName": "Internet",
+      "groupLabel": "🌍 對外連線",
+      "name": "ISP 節點",
+      "host": "168.95.192.1",
+      "type": "ping",
+      "ok": false,
+      "avgMs": null,
+      "lossPercent": 100
+    },
+    {
+      "groupName": "Internet",
+      "groupLabel": "🌍 對外連線",
+      "name": "Google Endpoint",
+      "host": "142.250.204.35",
+      "type": "ping",
+      "ok": false,
+      "avgMs": null,
+      "lossPercent": 100
+    },
+    {
+      "groupName": "Teaching",
+      "groupLabel": "📚 教學平台",
+      "name": "Google",
+      "host": "https://www.google.com",
+      "type": "http",
+      "ok": true,
+      "avgMs": 97,
+      "lossPercent": 0
+    },
+    {
+      "groupName": "Teaching",
+      "groupLabel": "📚 教學平台",
+      "name": "YouTube",
+      "host": "https://www.youtube.com",
+      "type": "http",
+      "ok": true,
+      "avgMs": 321,
+      "lossPercent": 0
+    },
+    {
+      "groupName": "Teaching",
+      "groupLabel": "📚 教學平台",
+      "name": "Wordwall",
+      "host": "https://wordwall.net",
+      "type": "http",
+      "ok": true,
+      "avgMs": 527,
+      "lossPercent": 0
+    },
+    {
+      "groupName": "Teaching",
+      "groupLabel": "📚 教學平台",
+      "name": "LINE",
+      "host": "https://line.me",
+      "type": "http",
+      "ok": true,
+      "avgMs": 689,
+      "lossPercent": 0
+    },
+    {
+      "groupName": "Admin",
+      "groupLabel": "📋 行政服務",
+      "name": "公文系統 ODIS",
+      "host": "https://odis.tycg.gov.tw/",
+      "type": "http",
+      "ok": false,
+      "avgMs": null,
+      "lossPercent": 100
+    },
+    {
+      "groupName": "Admin",
+      "groupLabel": "📋 行政服務",
+      "name": "差勤系統 CloudHR",
+      "host": "tycg.cloudhr.tw",
+      "type": "ping",
+      "ok": false,
+      "avgMs": null,
+      "lossPercent": 100
+    }
+  ]
+}
