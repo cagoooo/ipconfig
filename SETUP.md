@@ -1,51 +1,61 @@
-# 🛠️ 校內 Windows 主機設定指南
+# 🛠️ 完整部署指南
 
-把 `monitor.ps1` 設成每 5 分鐘自動執行 + 自動 push 到 GitHub 的完整步驟。
+本系統有兩部分：
+- **必要**：校內 Windows 主機跑採集（Section 1）+ GitHub Pages 啟用（Section 2）
+- **選用**：開啟 AI 日報與 LINE 推播（Section 3）
 
 ---
 
-## ✅ 前置條件
+## 📦 Section 1：校內 Windows 主機部署
 
-請先確認校內 Windows 主機上有以下工具：
+### 1.1 前置條件
+
+開 PowerShell 確認三個工具都有：
 
 ```powershell
-git --version    # 應該顯示 git 版本（沒有的話下載 https://git-scm.com/）
-gh --version     # GitHub CLI（下載 https://cli.github.com/）
-pwsh --version   # 或 powershell.exe 即可（Windows 內建）
+git --version    # https://git-scm.com/
+gh --version     # https://cli.github.com/
+$PSVersionTable.PSVersion  # PowerShell 5.1+ 即可（Windows 內建）
 ```
 
----
-
-## 📥 第一步：clone repo 到本機
-
-開啟 PowerShell（一般使用者即可，不必管理員）：
+### 1.2 Clone repo
 
 ```powershell
-# 找一個固定路徑，例如 C:\ipconfig
 cd C:\
 git clone https://github.com/cagoooo/ipconfig.git
 cd C:\ipconfig
 ```
 
----
-
-## 🔐 第二步：設定 git 身份 + GitHub 認證
+### 1.3 設定 git 認證
 
 ```powershell
-# 設定 commit 作者
 git config user.name "School Network Monitor"
 git config user.email "ipad@mail2.smes.tyc.edu.tw"
 
-# 用 gh CLI 認證，選 HTTPS + 瀏覽器登入
 gh auth login
-# 認證後 gh 會自動幫 git 設定好 credential helper
+# 選 GitHub.com → HTTPS → Y(authenticate Git) → Login with browser
 ```
 
-> 💡 認證一次以後，後續 `git push` 就不會再彈視窗了。
+### 1.4 編輯 targets.json
 
----
+填入校內真實的 IP 與目標：
 
-## 🧪 第三步：手動跑一次確認沒問題
+```json
+{
+  "groups": [
+    {
+      "name": "LAN",
+      "label": "🏫 校內設備",
+      "targets": [
+        { "name": "校內閘道", "host": "192.168.1.1", "type": "ping" },
+        { "name": "印表伺服器", "host": "192.168.1.50", "type": "ping" }
+      ]
+    }
+  ]
+}
+```
+
+### 1.5 手動跑一次測試
 
 ```powershell
 cd C:\ipconfig
@@ -53,19 +63,15 @@ powershell -ExecutionPolicy Bypass -File .\monitor.ps1
 ```
 
 預期看到：
-- ✅ Console 印出每個目標的檢測進度
-- ✅ 產生 `status.json`、`history.json`、`monitor.log`
-- ✅ 自動 commit 與 push（如果有變更的話）
+- ✅ Console 印出每個目標檢測進度
+- ✅ 產生 `status.json`、`history.json`、`daily.json`、`monitor.log`
+- ✅ 自動 commit + push（log 最後一行「已 push 到 GitHub」）
 
-打開 <https://cagoooo.github.io/ipconfig/> 看儀表板有沒有資料。
+### 1.6 設定 Windows 工作排程器（每 5 分鐘）
 
----
+#### 方法 A：PowerShell 一鍵建立（推薦）
 
-## ⏰ 第四步：設定 Windows 工作排程器（每 5 分鐘）
-
-### 方法 A：用 PowerShell 一鍵建立（推薦）
-
-開「**系統管理員 PowerShell**」，貼以下指令：
+開「**系統管理員 PowerShell**」貼下列指令：
 
 ```powershell
 $action = New-ScheduledTaskAction `
@@ -96,92 +102,153 @@ Register-ScheduledTask `
   -Description "每 5 分鐘檢測校內外網路狀態並 push 到 GitHub Pages"
 ```
 
-> 用 `LogonType S4U` 代表「不論使用者有沒有登入都會跑」，但這台主機要保持開機。
+#### 方法 B：GUI
 
-### 方法 B：用 GUI 一步一步點
+1. 工作排程器 → 建立工作（不是建立基本工作）
+2. 一般：勾「不論使用者登入與否均執行」
+3. 觸發程序 → 新增 → 一次 → 立即 → 進階：重複工作每隔 **5 分鐘**、無限期
+4. 動作 → 新增 → 啟動程式 → 程式 `powershell.exe`、引數 `-NoProfile -ExecutionPolicy Bypass -File C:\ipconfig\monitor.ps1`、開始位置 `C:\ipconfig`
+5. 設定 → 勾「儘速啟動已錯過排程的工作」、停止逾時 4 分鐘
 
-1. **開始** → 搜尋「**工作排程器**」→ 開啟
-2. 右側「**建立工作**」（不是「建立基本工作」）
-3. **一般** 分頁：
-   - 名稱：`School Network Monitor`
-   - 勾選「**不論使用者登入與否均執行**」
-4. **觸發程序** 分頁 → **新增**：
-   - 開始工作：依排程
-   - 一次：今天現在
-   - 進階設定：勾「**重複工作每隔 5 分鐘**」、持續時間「**無限期**」
-5. **動作** 分頁 → **新增**：
-   - 動作：啟動程式
-   - 程式：`powershell.exe`
-   - 引數：`-NoProfile -ExecutionPolicy Bypass -File C:\ipconfig\monitor.ps1`
-   - 開始位置：`C:\ipconfig`
-6. **設定** 分頁：
-   - 勾選「**儘速啟動已錯過排程的工作**」
-   - 「停止工作如果執行超過」設 `4 分鐘`
-7. 確定 → 輸入帳號密碼
-
----
-
-## 🔍 確認排程有在跑
+### 1.7 確認排程運作
 
 ```powershell
-# 看下次執行時間
 Get-ScheduledTask -TaskName "School Network Monitor" | Get-ScheduledTaskInfo
-
-# 看最近 monitor.log
 Get-Content C:\ipconfig\monitor.log -Tail 30
 ```
 
 ---
 
-## 🐛 疑難排解
+## 🌐 Section 2：GitHub Pages 啟用
 
-### Q1：`git push` 失敗 / 認證過期
-```powershell
-cd C:\ipconfig
-gh auth status         # 看是否還在登入狀態
-gh auth login          # 重新認證
-```
-
-### Q2：排程跑了但沒 push
-- 檢查 `monitor.log` 最後幾行
-- 確認排程的 `WorkingDirectory` 是 `C:\ipconfig`
-- 試著手動執行一次 `monitor.ps1` 確認能 push
-
-### Q3：commit 太多想清掉歷史
-- 因為每 5 分鐘一次，repo 會累積大量 commit。如果想「壓平」歷史：
-  ```powershell
-  git checkout --orphan tmp
-  git add -A
-  git commit -m "fresh start"
-  git branch -D main
-  git branch -m main
-  git push -f origin main
-  ```
-- ⚠️ 此操作會丟掉舊的 commit 歷史，請評估後再做。
-
-### Q4：想停止排程
-```powershell
-Disable-ScheduledTask -TaskName "School Network Monitor"
-# 或徹底刪除
-Unregister-ScheduledTask -TaskName "School Network Monitor" -Confirm:$false
-```
-
----
-
-## 🎯 啟用 GitHub Pages（首次部署用）
-
-repo push 上去之後，需要去 GitHub 開啟 Pages：
-
-1. 到 <https://github.com/cagoooo/ipconfig/settings/pages>
-2. **Source** 選「**Deploy from a branch**」
-3. **Branch** 選 `main` + `/ (root)` → **Save**
-4. 等 1–2 分鐘後 <https://cagoooo.github.io/ipconfig/> 即可開啟
-
-或一行 `gh` CLI 搞定：
+repo push 上去後，啟用 Pages：
 
 ```powershell
 gh api -X POST repos/cagoooo/ipconfig/pages -f "source[branch]=main" -f "source[path]=/"
 ```
+
+或在網頁 <https://github.com/cagoooo/ipconfig/settings/pages>：Source = `Deploy from a branch`，Branch = `main` + `/ (root)` → Save。
+
+等 1–2 分鐘後 <https://cagoooo.github.io/ipconfig/> 即可開啟。
+
+---
+
+## 🤖 Section 3：選用功能（AI 日報 + LINE 推播）
+
+兩個功能完全獨立，可單獨啟用。**不開也完全不影響核心監控**。
+
+### 3.1 取得 Gemini API Key（給 AI 日報用）
+
+1. 到 <https://aistudio.google.com/apikey>
+2. 用 `ipad@mail2.smes.tyc.edu.tw` 登入
+3. **Create API key** → 選任一 Google Cloud 專案（沒有就會自動建一個）
+4. 複製產生的 key（`AIzaSy...` 開頭，39 字元）
+
+> 💰 **完全免費**：Gemini 有免費層，每天有 1,500 次 `gemini-2.5-flash` 請求額度。日報每天只用 1 次，遠遠用不完。
+
+### 3.2 設定 LINE Messaging API（給狀態翻轉推播用）
+
+#### 3.2.1 建立 LINE Bot
+
+1. 到 <https://developers.line.biz/console/> 登入
+2. **Create new provider**（如果沒有的話）→ 隨便取個名字
+3. 在 provider 內 → **Create a Messaging API channel**
+4. 填基本資料（channel name 建議寫「石門國小網路告警」）
+5. 建立後進入該 channel 設定
+
+#### 3.2.2 取得 Channel Access Token
+
+1. 在 channel 設定頁 → **Messaging API** 分頁
+2. 滾到下方 **Channel access token (long-lived)** → **Issue**
+3. 複製產生的 token
+
+#### 3.2.3 取得接收訊息的 Target ID
+
+最簡單的方式 — **「自己加 bot 為好友後，從 webhook log 抓 userId」**：
+
+1. Messaging API 分頁找到 **QR code**，用手機 LINE 掃描加 bot 為好友
+2. 在 **Webhook URL** 暫時填一個臨時 webhook 服務（例如 <https://webhook.site/> 拿到的 URL）
+3. 啟用 **Use webhook**
+4. 用手機隨便傳一句話給 bot → 在 webhook.site 上看到 JSON，找到 `events[0].source.userId` 那串 `Uxxxx...`
+5. 那串就是你的 `LINE_TARGET_ID`
+
+> 💡 **群組推播**：把 bot 拉進 LINE 群組 → 群組裡傳訊息 → webhook 會收到 `groupId`，當作 target ID 即可。
+> ⚠️ **不要重用 LINE Notify 的 token**，那已經停止服務（2025-04），用了會 401。
+
+### 3.3 把三個 Secret 加進 GitHub repo
+
+到 <https://github.com/cagoooo/ipconfig/settings/secrets/actions> 點 **New repository secret**，依序加：
+
+| Name | Value |
+|---|---|
+| `GEMINI_API_KEY` | 步驟 3.1 拿到的 `AIzaSy...` |
+| `LINE_CHANNEL_ACCESS_TOKEN` | 步驟 3.2.2 拿到的 token |
+| `LINE_TARGET_ID` | 步驟 3.2.3 拿到的 `Uxxxx...` 或 `Cxxxx...` |
+
+或用 `gh` CLI 一行搞定：
+
+```powershell
+gh secret set GEMINI_API_KEY -b "AIzaSy..."
+gh secret set LINE_CHANNEL_ACCESS_TOKEN -b "你的token"
+gh secret set LINE_TARGET_ID -b "Uxxxxxxxxx"
+```
+
+### 3.4 觸發第一次測試
+
+```powershell
+# AI 日報（會用昨天的 daily.json 寫一份）
+gh workflow run daily-report.yml
+
+# LINE 推播（需要 status.json 有翻轉才會實際推；可手動翻一個目標看效果）
+gh workflow run alert-line.yml
+
+# 看執行結果
+gh run list --limit 5
+```
+
+---
+
+## 🔍 疑難排解
+
+### Q1：`monitor.ps1` 跑了但儀表板沒更新
+- `Get-Content C:\ipconfig\monitor.log -Tail 30` 看最後幾行
+- 確認 `gh auth status` 還有效，否則 `gh auth login` 重新認證
+- 確認排程的 **Working Directory** 是 `C:\ipconfig`（GUI 設定常見漏設）
+
+### Q2：GitHub Actions 跑失敗
+- <https://github.com/cagoooo/ipconfig/actions> 點失敗那次看 log
+- 常見：Secret 名字打錯（注意大小寫）、Token 過期、權限不足
+
+### Q3：LINE Bot 加好友後沒收到訊息
+- Messaging API 預設「**自動回覆**」是開的，會吃掉所有訊息。到 channel 設定 → **Messaging API** → **Auto-reply messages** 關掉
+- 確認 webhook URL 設好（如果是測試 userId 用，事後可以拿掉 webhook URL）
+
+### Q4：commit 太多想清掉歷史
+每 5 分鐘 + 每 15 分鐘 = 大量 commit。一個月後 repo 會肥。可定期：
+```powershell
+cd C:\ipconfig
+git checkout --orphan tmp
+git add -A
+git commit -m "fresh start"
+git branch -D main
+git branch -m main
+git push -f origin main
+```
+⚠️ 會丟掉舊 commit 歷史，評估後再做。
+
+### Q5：想暫停某個自動化
+```powershell
+# 暫停校內排程
+Disable-ScheduledTask -TaskName "School Network Monitor"
+
+# 暫停 GitHub Actions（任一）
+gh workflow disable external-probe.yml
+gh workflow disable daily-report.yml
+gh workflow disable alert-line.yml
+```
+
+### Q6：想換 Gemini 模型
+到 <https://github.com/cagoooo/ipconfig/settings/variables/actions> 加一個 repo variable `GEMINI_MODEL` 值為其他模型（例如 `gemini-2.5-pro`）。
 
 ---
 
