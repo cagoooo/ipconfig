@@ -236,6 +236,48 @@
     height: 320px;
   }
 
+  /* ===== External view ===== */
+  .external-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 16px 16px 14px;
+    box-shadow: var(--shadow);
+    margin-top: 24px;
+  }
+  .external-card h2 { font-size: 15px; margin: 0 0 4px 4px; }
+  .external-card .ext-meta { font-size: 12px; color: var(--ink-soft); margin: 0 4px 12px; }
+  .ext-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ext-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: var(--bg-soft);
+    border-radius: 999px;
+    font-size: 12.5px;
+    color: var(--ink);
+  }
+  .ext-pill .mini-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--ink-faint);
+  }
+  .ext-pill .mini-dot.green  { background: var(--green); }
+  .ext-pill .mini-dot.yellow { background: var(--yellow); }
+  .ext-pill .mini-dot.red    { background: var(--red); }
+  .ext-pill .ext-ms { color: var(--ink-soft); font-size: 11.5px; }
+  .ext-conflict {
+    display: inline-block;
+    background: var(--yellow-soft);
+    color: var(--yellow);
+    border: 1px solid var(--yellow);
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    margin-left: 8px;
+  }
+
   /* ===== History table ===== */
   .history-card {
     background: var(--card);
@@ -614,6 +656,58 @@
     renderActiveChart();
   }
 
+  /* ===== External view ===== */
+  function renderExternalView(externalSnap, internalSnap) {
+    if (!externalSnap || !externalSnap.results) return;
+
+    // 找出與校內視角的衝突（校內紅 vs 外部綠 → 校內出口問題；校內綠 vs 外部紅 → 比較少見但可能服務端問題或 GitHub runner 限制）
+    const internalMap = new Map();
+    if (internalSnap && internalSnap.results) {
+      internalSnap.results.forEach(r => {
+        internalMap.set(r.groupName + '::' + r.name, r);
+      });
+    }
+
+    const card = document.createElement('div');
+    card.className = 'external-card';
+    const h = document.createElement('h2');
+    h.textContent = '🌐 外部視角驗證';
+    card.appendChild(h);
+
+    const meta = document.createElement('div');
+    meta.className = 'ext-meta';
+    const reds = externalSnap.results.filter(r => classify(r) === 'red').length;
+    let conflictCount = 0;
+    externalSnap.results.forEach(r => {
+      const key = r.groupName + '::' + r.name;
+      const inside = internalMap.get(key);
+      if (inside && inside.ok && !r.ok) conflictCount++;
+      if (inside && !inside.ok && r.ok) conflictCount++;
+    });
+    meta.innerHTML = `GitHub Actions runner（美國/全球節點）· 最後更新 ${escapeHtml(externalSnap.timeLabel || '—')} · 共 ${externalSnap.results.length} 項${reds > 0 ? `，${reds} 異常` : '，全部正常'}` +
+      (conflictCount > 0 ? `<span class="ext-conflict">⚠ 與校內視角有 ${conflictCount} 處不一致</span>` : '');
+    card.appendChild(meta);
+
+    const list = document.createElement('div');
+    list.className = 'ext-list';
+    externalSnap.results.forEach(r => {
+      const cls = classify(r);
+      const pill = document.createElement('span');
+      pill.className = 'ext-pill';
+
+      const key = r.groupName + '::' + r.name;
+      const inside = internalMap.get(key);
+      let conflictMark = '';
+      if (inside && inside.ok && !r.ok) conflictMark = ' ⚠';
+      else if (inside && !inside.ok && r.ok) conflictMark = ' ⚠';
+
+      pill.innerHTML = `<span class="mini-dot ${cls}"></span>${escapeHtml(r.name)}<span class="ext-ms">${r.ok ? fmtMs(r.avgMs) : '無回應'}${conflictMark}</span>`;
+      list.appendChild(pill);
+    });
+    card.appendChild(list);
+    document.getElementById('main').appendChild(card);
+  }
+
   /* ===== History table ===== */
   function renderHistory(history, snapshot) {
     if (!history || history.length === 0) return;
@@ -657,10 +751,11 @@
   /* ===== Main load ===== */
   async function load() {
     try {
-      const [config, status, history] = await Promise.allSettled([
+      const [config, status, history, external] = await Promise.allSettled([
         fetchJson('targets.json'),
         fetchJson('status.json'),
-        fetchJson('history.json')
+        fetchJson('history.json'),
+        fetchJson('external-status.json')
       ]);
 
       if (config.status === 'fulfilled') {
@@ -683,6 +778,9 @@
       renderStatus(status.value);
       if (history.status === 'fulfilled' && history.value.length > 1) {
         renderCharts(history.value, status.value);
+      }
+      if (external.status === 'fulfilled') {
+        renderExternalView(external.value, status.value);
       }
       if (history.status === 'fulfilled') {
         renderHistory(history.value, status.value);

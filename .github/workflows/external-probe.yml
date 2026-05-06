@@ -1,0 +1,55 @@
+name: External Probe (外部視角)
+
+# 從 GitHub Actions ubuntu runner 探測公開目標
+# 與校內 Windows 採集點交叉比對，分辨「校內出口問題」vs「服務本身掛了」
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # 每 15 分鐘
+  workflow_dispatch:          # 也允許手動觸發
+
+permissions:
+  contents: write
+
+concurrency:
+  group: external-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run external probe
+        run: node scripts/external-probe.mjs
+
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet external-status.json 2>/dev/null; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git add external-status.json
+          git commit -m "external: $(date -u '+%Y-%m-%dT%H:%M:%SZ') [skip ci]"
+
+          for i in 1 2 3; do
+            if git pull --rebase origin main && git push; then
+              echo "Pushed on attempt $i"
+              exit 0
+            fi
+            echo "Push failed on attempt $i, retrying..."
+            sleep 5
+          done
+
+          echo "Push failed after 3 attempts"
+          exit 1
