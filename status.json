@@ -1,6 +1,6 @@
 {
-    "timestamp":  "2026-05-06T15:27:32+08:00",
-    "timeLabel":  "15:27:32",
+    "timestamp":  "2026-05-06T15:51:03+08:00",
+    "timeLabel":  "15:51:03",
     "results":  [
                     {
                         "groupName":  "DNS",
@@ -9,8 +9,13 @@
                         "host":  "8.8.8.8",
                         "type":  "ping",
                         "ok":  true,
-                        "avgMs":  6.75,
-                        "lossPercent":  0
+                        "avgMs":  4,
+                        "lossPercent":  0,
+                        "sla7d":  {
+                                      "uptimePercent":  100,
+                                      "avgMs":  4,
+                                      "sampleCount":  4
+                                  }
                     },
                     {
                         "groupName":  "DNS",
@@ -19,8 +24,13 @@
                         "host":  "1.1.1.1",
                         "type":  "ping",
                         "ok":  true,
-                        "avgMs":  2,
-                        "lossPercent":  0
+                        "avgMs":  1,
+                        "lossPercent":  0,
+                        "sla7d":  {
+                                      "uptimePercent":  100,
+                                      "avgMs":  1,
+                                      "sampleCount":  4
+                                  }
                     },
                     {
                         "groupName":  "DNS",
@@ -30,7 +40,12 @@
                         "type":  "ping",
                         "ok":  true,
                         "avgMs":  3,
-                        "lossPercent":  0
+                        "lossPercent":  0,
+                        "sla7d":  {
+                                      "uptimePercent":  100,
+                                      "avgMs":  3,
+                                      "sampleCount":  4
+                                  }
                     },
                     {
                         "groupName":  "LAN",
@@ -40,7 +55,12 @@
                         "type":  "ping",
                         "ok":  false,
                         "avgMs":  null,
-                        "lossPercent":  100
+                        "lossPercent":  100,
+                        "sla7d":  {
+                                      "uptimePercent":  0,
+                                      "avgMs":  null,
+                                      "sampleCount":  4
+                                  }
                     },
                     {
                         "groupName":  "LAN",
@@ -50,7 +70,12 @@
                         "type":  "ping",
                         "ok":  false,
                         "avgMs":  null,
-                        "lossPercent":  100
+                        "lossPercent":  100,
+                        "sla7d":  {
+                                      "uptimePercent":  0,
+                                      "avgMs":  null,
+                                      "sampleCount":  4
+                                  }
                     },
                     {
                         "groupName":  "LAN",
@@ -60,7 +85,12 @@
                         "type":  "ping",
                         "ok":  false,
                         "avgMs":  null,
-                        "lossPercent":  100
+                        "lossPercent":  100,
+                        "sla7d":  {
+                                      "uptimePercent":  0,
+                                      "avgMs":  null,
+                                      "sampleCount":  4
+                                  }
                     },
                     {
                         "groupName":  "Internet",
@@ -69,8 +99,13 @@
                         "host":  "168.95.192.1",
                         "type":  "ping",
                         "ok":  true,
-                        "avgMs":  6.75,
-                        "lossPercent":  0
+                        "avgMs":  4,
+                        "lossPercent":  0,
+                        "sla7d":  {
+                                      "uptimePercent":  100,
+                                      "avgMs":  4,
+                                      "sampleCount":  4
+                                  }
                     },
                     {
                         "groupName":  "Internet",
@@ -80,7 +115,12 @@
                         "type":  "ping",
                         "ok":  true,
                         "avgMs":  5,
-                        "lossPercent":  0
+                        "lossPercent":  0,
+                        "sla7d":  {
+                                      "uptimePercent":  100,
+                                      "avgMs":  5,
+                                      "sampleCount":  4
+                                  }
                     },
                     {
                         "groupName":  "Teaching",
@@ -89,8 +129,13 @@
                         "host":  "https://www.google.com",
                         "type":  "http",
                         "ok":  true,
-                        "avgMs":  134.71,
-                        "lossPercent":  0
+                        "avgMs":  136.09,
+                        "lossPercent":  0,
+                        "sla7d":  {
+                                      "uptimePercent":  100,
+                                      "avgMs":  136.09,
+                                      "sampleCount":  1
+                                  }
                     },
                     {
                         "groupName":  "Teaching",
@@ -99,8 +144,13 @@
                         "host":  "https://www.youtube.com",
                         "type":  "http",
                         "ok":  true,
-                        "avgMs":  234.29,
-                        "lossPercent":  0
+                        "avgMs":  307.41,
+                        "lossPercent":  0,
+                        "sla7d":  {
+                                      "uptimePercent":  100,
+                                      "avgMs":  307.41,
+                                      "sampleCount":  1
+                                  }
                     },
                     {
                         "groupName":  "Teaching",
@@ -109,8 +159,13 @@
                         "host":  "https://wordwall.net",
                         "type":  "http",
                         "ok":  true,
-                        "avgMs":  352.44,
-                        "lossPercent":  0
+                        "avgMs":  386.67,
+                        "lossPercent":  0,
+                        "sla7d":  {
+                                      "uptimePercent":  100,
+                                      "avgMs":  386.67,
+                                      "sampleCount":  1
+                                  }
                     },
                     {
                         "groupName":  "Teaching",
@@ -119,8 +174,13 @@
                         "host":  "https://line.me",
                         "type":  "http",
                         "ok":  true,
-                        "avgMs":  482.16,
-                        "lossPercent":  0
+                        "avgMs":  460.33,
+                        "lossPercent":  0,
+                        "sla7d":  {
+                                      "uptimePercent":  100,
+                                      "avgMs":  460.33,
+                                      "sampleCount":  1
+                                  }
                     },
                     {
                         "groupName":  "Admin",
@@ -129,8 +189,13 @@
                         "host":  "https://odis.tycg.gov.tw/",
                         "type":  "http",
                         "ok":  true,
-                        "avgMs":  49.58,
-                        "lossPercent":  0
+                        "avgMs":  37.97,
+                        "lossPercent":  0,
+                        "sla7d":  {
+                                      "uptimePercent":  100,
+                                      "avgMs":  37.97,
+                                      "sampleCount":  1
+                                  }
                     },
                     {
                         "groupName":  "Admin",
@@ -140,7 +205,12 @@
                         "type":  "ping",
                         "ok":  false,
                         "avgMs":  null,
-                        "lossPercent":  100
+                        "lossPercent":  100,
+                        "sla7d":  {
+                                      "uptimePercent":  0,
+                                      "avgMs":  null,
+                                      "sampleCount":  4
+                                  }
                     }
                 ]
 }
