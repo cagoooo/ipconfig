@@ -5,13 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>石門國小網路狀態儀表板</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏠%3C/text%3E%3C/svg%3E">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
+  /* ===== Theme variables ===== */
   :root {
     --bg: #f7f1e8;
+    --bg-soft: #efe6d3;
     --card: #fffdf8;
     --card-border: #ece2cf;
     --ink: #4a3f2f;
     --ink-soft: #8a7c66;
+    --ink-faint: #b6aa95;
     --shadow: 0 2px 6px rgba(150, 120, 80, 0.08), 0 8px 24px rgba(150, 120, 80, 0.06);
     --green: #5cb85c;
     --green-soft: #e8f5e9;
@@ -19,45 +23,118 @@
     --yellow-soft: #fff4e0;
     --red: #d9534f;
     --red-soft: #fdecea;
-    --gray: #b6aa95;
+    --link: #c97a3e;
     --row-alt: #fbf6ec;
+    --chip: #ece4d3;
   }
+  [data-theme="dark"] {
+    --bg: #15110d;
+    --bg-soft: #1d1813;
+    --card: #221c15;
+    --card-border: #3a322a;
+    --ink: #f0e6d2;
+    --ink-soft: #a39684;
+    --ink-faint: #6e6557;
+    --shadow: 0 2px 8px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25);
+    --green: #66c266;
+    --green-soft: #1f3a25;
+    --yellow: #f5b95c;
+    --yellow-soft: #3a2d18;
+    --red: #e26b67;
+    --red-soft: #3a1f1d;
+    --link: #e9a060;
+    --row-alt: #1c1711;
+    --chip: #2e2620;
+  }
+
   * { box-sizing: border-box; }
   html, body {
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     background: var(--bg);
     font-family: "Segoe UI", "Microsoft JhengHei", "PingFang TC", -apple-system, sans-serif;
     color: var(--ink);
     line-height: 1.55;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
   .wrap {
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 32px 20px 64px;
+    padding: 28px 20px 64px;
   }
+
+  /* ===== Header ===== */
   header {
-    text-align: center;
     margin-bottom: 28px;
     padding-bottom: 20px;
     border-bottom: 2px dashed var(--card-border);
   }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
   header h1 {
     font-size: 28px;
-    margin: 0 0 6px;
+    margin: 0;
     letter-spacing: 1px;
   }
-  header .subtitle {
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .icon-btn {
+    background: var(--card);
+    color: var(--ink);
+    border: 1px solid var(--card-border);
+    border-radius: 999px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+    box-shadow: var(--shadow);
+  }
+  .icon-btn:hover { transform: translateY(-1px); }
+  .icon-btn:active { transform: translateY(0); }
+
+  .badge-bar {
+    text-align: center;
+    margin: 12px 0 6px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 15px;
+    background: var(--green-soft);
+    color: var(--green);
+    border: 1px solid var(--green);
+    transition: all 0.25s ease;
+  }
+  .badge.warn { background: var(--yellow-soft); color: var(--yellow); border-color: var(--yellow); }
+  .badge.alert { background: var(--red-soft); color: var(--red); border-color: var(--red); animation: pulse 2s infinite; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(217,83,79,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(217,83,79,0); }
+  }
+  .subtitle {
+    text-align: center;
     color: var(--ink-soft);
     font-size: 14px;
   }
-  header .meta {
-    margin-top: 10px;
+  .meta {
+    text-align: center;
+    margin-top: 8px;
     font-size: 13px;
     color: var(--ink-soft);
   }
-  header .meta strong { color: var(--ink); }
+  .meta strong { color: var(--ink); }
 
+  /* ===== Status cards ===== */
   section.group { margin-bottom: 26px; }
   section.group h2 {
     font-size: 16px;
@@ -67,31 +144,27 @@
   }
   .cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 14px;
   }
   .card {
     background: var(--card);
     border: 1px solid var(--card-border);
     border-radius: 14px;
-    padding: 18px 16px 20px;
+    padding: 18px 16px 18px;
     text-align: center;
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
   .card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(150,120,80,0.12), 0 12px 28px rgba(150,120,80,0.10);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.10), 0 12px 28px rgba(0,0,0,0.08);
   }
-  .card .name {
-    font-weight: 600;
-    font-size: 15px;
-    color: var(--ink);
-  }
+  .card .name { font-weight: 600; font-size: 15px; color: var(--ink); }
   .card .host {
     font-size: 11.5px;
     color: var(--ink-soft);
@@ -99,23 +172,71 @@
     word-break: break-all;
   }
   .ball {
-    width: 46px;
-    height: 46px;
+    width: 46px; height: 46px;
     border-radius: 50%;
-    display: inline-block;
-    box-shadow: 0 0 0 3px rgba(255,255,255,0.6), 0 4px 10px rgba(0,0,0,0.08);
-    background: radial-gradient(circle at 30% 25%, #fff8 0%, transparent 45%), var(--gray);
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.55), 0 4px 10px rgba(0,0,0,0.12);
+    background: radial-gradient(circle at 30% 25%, #fff8 0%, transparent 45%), var(--ink-faint);
+    margin: 4px 0;
+  }
+  [data-theme="dark"] .ball {
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.08), 0 4px 10px rgba(0,0,0,0.4);
   }
   .ball.green   { background: radial-gradient(circle at 30% 25%, #fff8 0%, transparent 45%), var(--green); }
   .ball.yellow  { background: radial-gradient(circle at 30% 25%, #fff8 0%, transparent 45%), var(--yellow); }
   .ball.red     { background: radial-gradient(circle at 30% 25%, #fff8 0%, transparent 45%), var(--red); }
-  .latency {
-    font-size: 13px;
-    color: var(--ink-soft);
-  }
+  .latency { font-size: 13px; color: var(--ink-soft); }
   .latency strong { color: var(--ink); font-size: 15px; }
+  .sla {
+    font-size: 12px;
+    color: var(--ink-soft);
+    background: var(--bg-soft);
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-top: 4px;
+  }
 
-  /* 歷史紀錄表格 */
+  /* ===== Charts ===== */
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 18px 16px 14px;
+    box-shadow: var(--shadow);
+    margin-top: 24px;
+  }
+  .chart-card h2 {
+    font-size: 16px;
+    margin: 0 0 12px 4px;
+  }
+  .tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .tab {
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--bg-soft);
+    color: var(--ink-soft);
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s ease;
+  }
+  .tab:hover { background: var(--chip); }
+  .tab.active {
+    background: var(--card);
+    color: var(--ink);
+    border-color: var(--card-border);
+    font-weight: 600;
+  }
+  .chart-wrap {
+    position: relative;
+    height: 320px;
+  }
+
+  /* ===== History table ===== */
   .history-card {
     background: var(--card);
     border: 1px solid var(--card-border);
@@ -125,10 +246,7 @@
     margin-top: 24px;
     overflow-x: auto;
   }
-  .history-card h2 {
-    font-size: 16px;
-    margin: 0 0 14px 4px;
-  }
+  .history-card h2 { font-size: 16px; margin: 0 0 14px 4px; }
   table.history {
     width: 100%;
     border-collapse: collapse;
@@ -152,7 +270,7 @@
   .time-chip {
     display: inline-block;
     padding: 4px 10px;
-    background: #ece4d3;
+    background: var(--chip);
     border-radius: 6px;
     font-family: "Consolas", "Menlo", monospace;
     font-size: 12px;
@@ -160,18 +278,18 @@
   }
   .dot {
     display: inline-block;
-    width: 10px;
-    height: 10px;
+    width: 10px; height: 10px;
     border-radius: 50%;
     margin-right: 6px;
     vertical-align: middle;
-    background: var(--gray);
+    background: var(--ink-faint);
   }
   .dot.green  { background: var(--green); }
   .dot.yellow { background: var(--yellow); }
   .dot.red    { background: var(--red); }
   .ms-na { color: var(--red); font-weight: 600; }
 
+  /* ===== Footer ===== */
   footer {
     margin-top: 40px;
     text-align: center;
@@ -181,7 +299,7 @@
     border-top: 2px dashed var(--card-border);
   }
   footer a {
-    color: #c97a3e;
+    color: var(--link);
     text-decoration: none;
     font-weight: 600;
   }
@@ -199,13 +317,21 @@
     header h1 { font-size: 22px; }
     .cards { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
     .ball { width: 38px; height: 38px; }
+    .chart-wrap { height: 260px; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1 id="pageTitle">🏠 石門國小網路狀態儀表板</h1>
+    <div class="header-top">
+      <h1 id="pageTitle">🏠 石門國小網路狀態儀表板</h1>
+      <div class="header-actions">
+        <button class="icon-btn" id="refreshBtn" title="立即重整">🔄</button>
+        <button class="icon-btn" id="themeBtn" title="切換明暗模式">🌙</button>
+      </div>
+    </div>
+    <div class="badge-bar"><span class="badge" id="statusBadge">⏳ 載入中…</span></div>
     <div class="subtitle" id="pageSubtitle">校園網路即時監控（每 5 分鐘自動更新）</div>
     <div class="meta">最後更新：<strong id="lastUpdate">—</strong></div>
   </header>
@@ -223,9 +349,35 @@
 </div>
 
 <script>
+  /* ===== Theme ===== */
+  const THEME_KEY = 'ipconfig.theme';
+  const themeBtn = document.getElementById('themeBtn');
+  function applyTheme(t) {
+    document.documentElement.dataset.theme = t;
+    themeBtn.textContent = t === 'dark' ? '☀️' : '🌙';
+    localStorage.setItem(THEME_KEY, t);
+    if (Object.keys(charts).length > 0) {
+      Object.values(charts).forEach(c => updateChartTheme(c));
+    }
+  }
+  (function initTheme() {
+    const saved = localStorage.getItem(THEME_KEY);
+    const sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    applyTheme(saved || sys);
+  })();
+  themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+  });
+
+  /* ===== Constants & state ===== */
   const REFRESH_MS = 60 * 1000;
   let thresholds = { greenMaxMs: 100, yellowMaxMs: 300, yellowMaxLossPercent: 30 };
+  const charts = {}; // groupName -> Chart instance
+  let activeGroupTab = null;
+  const COLOR_PALETTE = ['#5cb85c', '#5bc0de', '#f0ad4e', '#9b59b6', '#1abc9c', '#e67e22', '#3498db', '#e74c3c', '#2ecc71', '#16a085', '#d35400'];
 
+  /* ===== Helpers ===== */
   function classify(entry) {
     if (!entry || !entry.ok) return 'red';
     const ms = entry.avgMs;
@@ -236,20 +388,54 @@
     if (ms <= thresholds.yellowMaxMs && loss <= thresholds.yellowMaxLossPercent) return 'yellow';
     return 'red';
   }
-
   function fmtMs(ms) {
     if (ms === null || ms === undefined) return '—';
     return ms.toFixed(ms < 10 ? 2 : 1) + 'ms';
   }
-
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
   async function fetchJson(path) {
     const url = path + '?t=' + Date.now();
     const r = await fetch(url, { cache: 'no-store' });
     if (!r.ok) throw new Error(path + ' ' + r.status);
     return r.json();
   }
+  function getCssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
 
-  function renderStatus(snapshot, config) {
+  /* ===== Anomaly badge ===== */
+  function updateBadge(snapshot) {
+    const badge = document.getElementById('statusBadge');
+    if (!snapshot || !snapshot.results) {
+      badge.textContent = '⏳ 載入中…';
+      badge.className = 'badge';
+      return;
+    }
+    const total = snapshot.results.length;
+    const red = snapshot.results.filter(r => classify(r) === 'red').length;
+    const yellow = snapshot.results.filter(r => classify(r) === 'yellow').length;
+    const baseTitle = document.getElementById('pageTitle').textContent.replace(/^\(\d+\)\s*/, '');
+    if (red > 0) {
+      badge.textContent = `🚨 有 ${red} 個目標異常 · ${yellow > 0 ? yellow + ' 個變慢 · ' : ''}全部 ${total} 項`;
+      badge.className = 'badge alert';
+      document.title = `(${red}) 石門國小網路狀態儀表板`;
+    } else if (yellow > 0) {
+      badge.textContent = `⚠ ${yellow} 個變慢 · ${total - yellow} 個正常`;
+      badge.className = 'badge warn';
+      document.title = `(${yellow}⚠) 石門國小網路狀態儀表板`;
+    } else {
+      badge.textContent = `✅ 全部 ${total} 項正常`;
+      badge.className = 'badge';
+      document.title = '石門國小網路狀態儀表板';
+    }
+  }
+
+  /* ===== Status cards ===== */
+  function renderStatus(snapshot) {
     const main = document.getElementById('main');
     main.innerHTML = '';
     if (!snapshot || !snapshot.results || snapshot.results.length === 0) {
@@ -259,13 +445,11 @@
 
     document.getElementById('lastUpdate').textContent = snapshot.timestamp || '—';
 
-    // 分組顯示
+    // 分組
     const groupsMap = new Map();
     snapshot.results.forEach(r => {
       const key = r.groupName || 'default';
-      if (!groupsMap.has(key)) {
-        groupsMap.set(key, { label: r.groupLabel || key, items: [] });
-      }
+      if (!groupsMap.has(key)) groupsMap.set(key, { label: r.groupLabel || key, items: [] });
       groupsMap.get(key).items.push(r);
     });
 
@@ -278,11 +462,13 @@
 
       const grid = document.createElement('div');
       grid.className = 'cards';
-
       group.items.forEach(item => {
         const cls = classify(item);
         const card = document.createElement('div');
         card.className = 'card';
+        const slaHtml = (item.sla7d && item.sla7d.uptimePercent !== null && item.sla7d.uptimePercent !== undefined)
+          ? `<span class="sla">7日可用率 <strong>${item.sla7d.uptimePercent.toFixed(2)}%</strong></span>`
+          : '';
         card.innerHTML = `
           <div class="name">${escapeHtml(item.name)}</div>
           <div class="host">${escapeHtml(item.host)}</div>
@@ -293,6 +479,7 @@
               : `<span class="ms-na">⚠ 無回應</span>`}
             ${item.lossPercent > 0 && item.lossPercent < 100 ? ` · 丟包 ${item.lossPercent}%` : ''}
           </div>
+          ${slaHtml}
         `;
         grid.appendChild(card);
       });
@@ -301,12 +488,136 @@
     });
   }
 
-  function renderHistory(history, snapshot) {
+  /* ===== Charts ===== */
+  function updateChartTheme(chart) {
+    const ink = getCssVar('--ink');
+    const inkSoft = getCssVar('--ink-soft');
+    const border = getCssVar('--card-border');
+    chart.options.scales.x.ticks.color = inkSoft;
+    chart.options.scales.y.ticks.color = inkSoft;
+    chart.options.scales.x.grid.color = border;
+    chart.options.scales.y.grid.color = border;
+    chart.options.scales.y.title.color = ink;
+    chart.options.plugins.legend.labels.color = ink;
+    chart.update('none');
+  }
+
+  function renderCharts(history, snapshot) {
     if (!history || history.length === 0) return;
 
-    // 用最新 snapshot 的 results 順序作為欄位
-    const cols = snapshot.results.map(r => ({ groupName: r.groupName, name: r.name }));
+    // 從最新 snapshot 拿到所有群組與其目標
+    const groupsMap = new Map();
+    snapshot.results.forEach(r => {
+      const key = r.groupName;
+      if (!groupsMap.has(key)) groupsMap.set(key, { label: r.groupLabel, targetNames: [] });
+      groupsMap.get(key).targetNames.push(r.name);
+    });
 
+    const container = document.createElement('div');
+    container.className = 'chart-card';
+    const h = document.createElement('h2');
+    h.textContent = `📈 延遲趨勢圖（最近 ${Math.min(history.length, 288)} 筆，${Math.round(history.length * 5 / 60 * 10) / 10} 小時）`;
+    container.appendChild(h);
+
+    // 分組 tabs
+    const tabsBar = document.createElement('div');
+    tabsBar.className = 'tabs';
+    const wrap = document.createElement('div');
+    wrap.className = 'chart-wrap';
+    const canvas = document.createElement('canvas');
+    canvas.id = 'mainChart';
+    wrap.appendChild(canvas);
+
+    container.appendChild(tabsBar);
+    container.appendChild(wrap);
+    document.getElementById('main').appendChild(container);
+
+    // 預設選第一個群組或保留上次選擇
+    if (!activeGroupTab || !groupsMap.has(activeGroupTab)) {
+      activeGroupTab = groupsMap.keys().next().value;
+    }
+
+    function renderActiveChart() {
+      const group = groupsMap.get(activeGroupTab);
+      if (!group) return;
+
+      // 反轉 history（最舊 → 最新）方便 X 軸
+      const reversed = history.slice().reverse();
+      const labels = reversed.map(snap => snap.timeLabel || (snap.timestamp || '').slice(11, 19));
+      const datasets = group.targetNames.map((targetName, idx) => {
+        const color = COLOR_PALETTE[idx % COLOR_PALETTE.length];
+        const data = reversed.map(snap => {
+          const r = (snap.results || []).find(x => x.groupName === activeGroupTab && x.name === targetName);
+          return (r && r.ok) ? r.avgMs : null;
+        });
+        return {
+          label: targetName,
+          data,
+          borderColor: color,
+          backgroundColor: color + '20',
+          tension: 0.25,
+          spanGaps: false,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          borderWidth: 2,
+        };
+      });
+
+      // 銷毀舊圖
+      if (charts.main) { charts.main.destroy(); }
+      const ctx = canvas.getContext('2d');
+      charts.main = new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'top', labels: { color: getCssVar('--ink'), font: { size: 12 } } },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y === null ? '無回應' : ctx.parsed.y.toFixed(1) + ' ms'}`
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: getCssVar('--ink-soft'), maxRotation: 0, autoSkipPadding: 16 },
+              grid: { color: getCssVar('--card-border') }
+            },
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: '延遲 (ms)', color: getCssVar('--ink') },
+              ticks: { color: getCssVar('--ink-soft') },
+              grid: { color: getCssVar('--card-border') }
+            }
+          }
+        }
+      });
+    }
+
+    // 建立 tab 按鈕
+    groupsMap.forEach((group, name) => {
+      const btn = document.createElement('button');
+      btn.className = 'tab' + (name === activeGroupTab ? ' active' : '');
+      btn.textContent = group.label;
+      btn.addEventListener('click', () => {
+        activeGroupTab = name;
+        tabsBar.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        renderActiveChart();
+      });
+      tabsBar.appendChild(btn);
+    });
+
+    renderActiveChart();
+  }
+
+  /* ===== History table ===== */
+  function renderHistory(history, snapshot) {
+    if (!history || history.length === 0) return;
+    const cols = snapshot.results.map(r => ({ groupName: r.groupName, name: r.name }));
     const container = document.createElement('div');
     container.className = 'history-card';
     const h = document.createElement('h2');
@@ -328,9 +639,8 @@
       let html = `<td><span class="time-chip">${escapeHtml(time)}</span></td>`;
       cols.forEach(col => {
         const r = (snap.results || []).find(x => x.groupName === col.groupName && x.name === col.name);
-        if (!r) {
-          html += '<td>—</td>';
-        } else {
+        if (!r) html += '<td>—</td>';
+        else {
           const cls = classify(r);
           const text = r.ok ? fmtMs(r.avgMs) : '無回應';
           html += `<td><span class="dot ${cls}"></span>${escapeHtml(text)}</td>`;
@@ -344,12 +654,7 @@
     document.getElementById('main').appendChild(container);
   }
 
-  function escapeHtml(s) {
-    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    }[c]));
-  }
-
+  /* ===== Main load ===== */
   async function load() {
     try {
       const [config, status, history] = await Promise.allSettled([
@@ -360,19 +665,25 @@
 
       if (config.status === 'fulfilled') {
         const c = config.value;
-        if (c.title) document.getElementById('pageTitle').textContent = '🏠 ' + c.title;
+        if (c.title) {
+          document.getElementById('pageTitle').textContent = '🏠 ' + c.title;
+        }
         if (c.subtitle) document.getElementById('pageSubtitle').textContent = c.subtitle;
         if (c.thresholds) thresholds = Object.assign(thresholds, c.thresholds);
-        document.title = c.title || document.title;
       }
 
       if (status.status !== 'fulfilled') {
         document.getElementById('main').innerHTML =
           '<div class="empty">⚠ 尚未產生 status.json，請等待第一次檢測完成</div>';
+        document.getElementById('statusBadge').textContent = '尚無資料';
         return;
       }
 
-      renderStatus(status.value, config.value || {});
+      updateBadge(status.value);
+      renderStatus(status.value);
+      if (history.status === 'fulfilled' && history.value.length > 1) {
+        renderCharts(history.value, status.value);
+      }
       if (history.status === 'fulfilled') {
         renderHistory(history.value, status.value);
       }
@@ -382,6 +693,13 @@
         '<div class="empty">⚠ 載入失敗：' + escapeHtml(err.message) + '</div>';
     }
   }
+
+  document.getElementById('refreshBtn').addEventListener('click', () => {
+    document.getElementById('refreshBtn').textContent = '⏳';
+    load().finally(() => {
+      setTimeout(() => { document.getElementById('refreshBtn').textContent = '🔄'; }, 600);
+    });
+  });
 
   load();
   setInterval(load, REFRESH_MS);

@@ -1,7 +1,7 @@
 {
   "title": "石門國小網路狀態儀表板",
   "subtitle": "校園網路即時監控（每 5 分鐘自動更新）",
-  "historyLimit": 100,
+  "historyLimit": 288,
   "thresholds": {
     "greenMaxMs": 100,
     "yellowMaxMs": 300,
