@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-05-06T08:12:10.072Z",
-  "timeLabel": "16:12:10",
+  "timestamp": "2026-05-06T09:28:21.175Z",
+  "timeLabel": "17:28:21",
   "source": "github-actions-runner",
-  "note": "外部視角（GitHub Actions ubuntu runner）— 已排除內網 IP",
+  "note": "外部視角（GitHub Actions ubuntu runner）— 已排除內網 IP；ping 類型用 TCP 連線探測（port 443/80/53），不是 ICMP",
   "results": [
     {
       "groupName": "DNS",
@@ -10,9 +10,10 @@
       "name": "Google DNS",
       "host": "8.8.8.8",
       "type": "ping",
-      "ok": false,
-      "avgMs": null,
-      "lossPercent": 100
+      "ok": true,
+      "avgMs": 8,
+      "lossPercent": 0,
+      "probeViaPort": 53
     },
     {
       "groupName": "DNS",
@@ -20,9 +21,10 @@
       "name": "Cloudflare DNS",
       "host": "1.1.1.1",
       "type": "ping",
-      "ok": false,
-      "avgMs": null,
-      "lossPercent": 100
+      "ok": true,
+      "avgMs": 5,
+      "lossPercent": 0,
+      "probeViaPort": 53
     },
     {
       "groupName": "DNS",
@@ -30,9 +32,10 @@
       "name": "HINET DNS",
       "host": "168.95.1.1",
       "type": "ping",
-      "ok": false,
-      "avgMs": null,
-      "lossPercent": 100
+      "ok": true,
+      "avgMs": 188,
+      "lossPercent": 0,
+      "probeViaPort": 53
     },
     {
       "groupName": "Internet",
@@ -40,9 +43,10 @@
       "name": "ISP 節點",
       "host": "168.95.192.1",
       "type": "ping",
-      "ok": false,
-      "avgMs": null,
-      "lossPercent": 100
+      "ok": true,
+      "avgMs": 191,
+      "lossPercent": 0,
+      "probeViaPort": 53
     },
     {
       "groupName": "Internet",
@@ -50,9 +54,10 @@
       "name": "Google Endpoint",
       "host": "142.250.204.35",
       "type": "ping",
-      "ok": false,
-      "avgMs": null,
-      "lossPercent": 100
+      "ok": true,
+      "avgMs": 194,
+      "lossPercent": 0,
+      "probeViaPort": 443
     },
     {
       "groupName": "Teaching",
@@ -61,7 +66,7 @@
       "host": "https://www.google.com",
       "type": "http",
       "ok": true,
-      "avgMs": 71,
+      "avgMs": 72,
       "lossPercent": 0
     },
     {
@@ -71,7 +76,7 @@
       "host": "https://www.youtube.com",
       "type": "http",
       "ok": true,
-      "avgMs": 192,
+      "avgMs": 249,
       "lossPercent": 0
     },
     {
@@ -81,7 +86,7 @@
       "host": "https://wordwall.net",
       "type": "http",
       "ok": true,
-      "avgMs": 361,
+      "avgMs": 423,
       "lossPercent": 0
     },
     {
@@ -91,7 +96,7 @@
       "host": "https://line.me",
       "type": "http",
       "ok": true,
-      "avgMs": 827,
+      "avgMs": 816,
       "lossPercent": 0
     },
     {
@@ -110,9 +115,10 @@
       "name": "差勤系統 CloudHR",
       "host": "tycg.cloudhr.tw",
       "type": "ping",
-      "ok": false,
-      "avgMs": null,
-      "lossPercent": 100
+      "ok": true,
+      "avgMs": 425,
+      "lossPercent": 0,
+      "probeViaPort": 80
     }
   ]
 }
