@@ -1,6 +1,6 @@
 {
-    "timestamp":  "2026-05-06T15:25:51+08:00",
-    "timeLabel":  "15:25:51",
+    "timestamp":  "2026-05-06T15:27:32+08:00",
+    "timeLabel":  "15:27:32",
     "results":  [
                     {
                         "groupName":  "DNS",
@@ -9,7 +9,7 @@
                         "host":  "8.8.8.8",
                         "type":  "ping",
                         "ok":  true,
-                        "avgMs":  9.5,
+                        "avgMs":  6.75,
                         "lossPercent":  0
                     },
                     {
@@ -19,7 +19,7 @@
                         "host":  "1.1.1.1",
                         "type":  "ping",
                         "ok":  true,
-                        "avgMs":  1.5,
+                        "avgMs":  2,
                         "lossPercent":  0
                     },
                     {
@@ -69,7 +69,7 @@
                         "host":  "168.95.192.1",
                         "type":  "ping",
                         "ok":  true,
-                        "avgMs":  7.25,
+                        "avgMs":  6.75,
                         "lossPercent":  0
                     },
                     {
@@ -89,7 +89,7 @@
                         "host":  "https://www.google.com",
                         "type":  "http",
                         "ok":  true,
-                        "avgMs":  179.6,
+                        "avgMs":  134.71,
                         "lossPercent":  0
                     },
                     {
@@ -99,7 +99,7 @@
                         "host":  "https://www.youtube.com",
                         "type":  "http",
                         "ok":  true,
-                        "avgMs":  295.62,
+                        "avgMs":  234.29,
                         "lossPercent":  0
                     },
                     {
@@ -109,7 +109,7 @@
                         "host":  "https://wordwall.net",
                         "type":  "http",
                         "ok":  true,
-                        "avgMs":  416.8,
+                        "avgMs":  352.44,
                         "lossPercent":  0
                     },
                     {
@@ -119,7 +119,7 @@
                         "host":  "https://line.me",
                         "type":  "http",
                         "ok":  true,
-                        "avgMs":  745.1,
+                        "avgMs":  482.16,
                         "lossPercent":  0
                     },
                     {
@@ -129,7 +129,7 @@
                         "host":  "https://odis.tycg.gov.tw/",
                         "type":  "http",
                         "ok":  true,
-                        "avgMs":  73.98,
+                        "avgMs":  49.58,
                         "lossPercent":  0
                     },
                     {
