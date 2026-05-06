@@ -1,0 +1,39 @@
+name: Status Alert (LINE 推播)
+
+# status.json 一有變動就觸發。腳本只在「ok 狀態翻轉」時才實際推播，
+# 純延遲變化不會打擾。
+#
+# 必要 GitHub Secrets：
+#   LINE_CHANNEL_ACCESS_TOKEN  — LINE Developers → Messaging API channel
+#   LINE_TARGET_ID             — userId / groupId / roomId
+on:
+  push:
+    branches: [main]
+    paths: ['status.json']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: alert-line
+  cancel-in-progress: false
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2   # 需要前一筆 commit 才能比對
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Compare & alert via LINE
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_TARGET_ID: ${{ secrets.LINE_TARGET_ID }}
+        run: node scripts/alert-line.mjs
