@@ -1,5 +1,5 @@
 ﻿# ============================================================
-# 中平國小網路狀態監控腳本（Windows PowerShell）
+# 石門國小網路狀態監控腳本（Windows PowerShell）
 # 用途：定時 ping/HTTP 探測 targets.json 內的目標，產生 status.json
 #       與 history.json，並 git push 到 GitHub Pages
 # 排程：建議用「Windows 工作排程器」每 5 分鐘執行一次

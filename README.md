@@ -1,4 +1,4 @@
-# 🏠 中平國小網路狀態儀表板
+# 🏠 石門國小網路狀態儀表板
 
 > **Windows 校內主機 + GitHub Pages** 混合架構的校園網路即時監控系統。
 > 延續老師原本 SmokePing / Python warroom 的精神，但前台搬到 GitHub Pages 公開可分享。
