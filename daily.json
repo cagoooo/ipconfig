@@ -1,0 +1,76 @@
+{
+    "days":  {
+                 "2026-05-06":  {
+                                    "Admin::差勤系統 CloudHR":  {
+                                                                "sent":  4,
+                                                                "msSum":  0,
+                                                                "received":  0
+                                                            },
+                                    "Internet::Google Endpoint":  {
+                                                                      "sent":  4,
+                                                                      "msSum":  20,
+                                                                      "received":  4
+                                                                  },
+                                    "DNS::HINET DNS":  {
+                                                           "sent":  4,
+                                                           "msSum":  12,
+                                                           "received":  4
+                                                       },
+                                    "Teaching::Google":  {
+                                                             "sent":  1,
+                                                             "msSum":  136.09,
+                                                             "received":  1
+                                                         },
+                                    "LAN::校內雲端":  {
+                                                      "sent":  4,
+                                                      "msSum":  0,
+                                                      "received":  0
+                                                  },
+                                    "LAN::校內閘道":  {
+                                                      "sent":  4,
+                                                      "msSum":  0,
+                                                      "received":  0
+                                                  },
+                                    "Internet::ISP 節點":  {
+                                                             "sent":  4,
+                                                             "msSum":  16,
+                                                             "received":  4
+                                                         },
+                                    "DNS::Cloudflare DNS":  {
+                                                                "sent":  4,
+                                                                "msSum":  4,
+                                                                "received":  4
+                                                            },
+                                    "DNS::Google DNS":  {
+                                                            "sent":  4,
+                                                            "msSum":  16,
+                                                            "received":  4
+                                                        },
+                                    "Teaching::YouTube":  {
+                                                              "sent":  1,
+                                                              "msSum":  307.41,
+                                                              "received":  1
+                                                          },
+                                    "Teaching::Wordwall":  {
+                                                               "sent":  1,
+                                                               "msSum":  386.67,
+                                                               "received":  1
+                                                           },
+                                    "Admin::公文系統 ODIS":  {
+                                                             "sent":  1,
+                                                             "msSum":  37.97,
+                                                             "received":  1
+                                                         },
+                                    "Teaching::LINE":  {
+                                                           "sent":  1,
+                                                           "msSum":  460.33,
+                                                           "received":  1
+                                                       },
+                                    "LAN::NAS01":  {
+                                                       "sent":  4,
+                                                       "msSum":  0,
+                                                       "received":  0
+                                                   }
+                                }
+             }
+}

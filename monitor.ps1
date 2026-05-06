@@ -11,6 +11,7 @@ $TargetsFile   = Join-Path $RepoDir 'targets.json'
 $StatusFile    = Join-Path $RepoDir 'status.json'
 $HistoryFile   = Join-Path $RepoDir 'history.json'
 $LogFile       = Join-Path $RepoDir 'monitor.log'
+$DailyFile     = Join-Path $RepoDir 'daily.json'
 
 function Write-Log {
     param([string]$Message)
@@ -145,6 +146,98 @@ try {
         }
     }
 
+    # ----------------------------------------
+    # SLA 統計：維護 daily.json + 計算近 7 日可用率
+    # ----------------------------------------
+    $todayKey = $now.ToString('yyyy-MM-dd')
+    $dailyAgg = @{}
+    if (Test-Path $DailyFile) {
+        try {
+            $rawDaily = Get-Content -Path $DailyFile -Raw -Encoding UTF8 | ConvertFrom-Json
+            if ($rawDaily -and $rawDaily.days) {
+                foreach ($dayProp in $rawDaily.days.PSObject.Properties) {
+                    $targetsHash = @{}
+                    foreach ($tProp in $dayProp.Value.PSObject.Properties) {
+                        $tv = $tProp.Value
+                        $targetsHash[$tProp.Name] = @{
+                            sent     = [int]$tv.sent
+                            received = [int]$tv.received
+                            msSum    = [double]$tv.msSum
+                        }
+                    }
+                    $dailyAgg[$dayProp.Name] = $targetsHash
+                }
+            }
+        } catch {
+            Write-Log "daily.json 解析失敗，重新建立"
+            $dailyAgg = @{}
+        }
+    }
+    if (-not $dailyAgg.ContainsKey($todayKey)) { $dailyAgg[$todayKey] = @{} }
+
+    # 把這次跑的結果加進今日桶
+    foreach ($r in $resultsList) {
+        $key = "$($r.groupName)::$($r.name)"
+        if (-not $dailyAgg[$todayKey].ContainsKey($key)) {
+            $dailyAgg[$todayKey][$key] = @{ sent = 0; received = 0; msSum = 0.0 }
+        }
+        $sent = if ($r.type -eq 'http') { 1 } else { 4 }
+        $received = if ($r.ok) {
+            [int][math]::Round((100 - $r.lossPercent) / 100 * $sent)
+        } else { 0 }
+        $msAdd = if ($r.ok -and $null -ne $r.avgMs) {
+            [double]$r.avgMs * $received
+        } else { 0.0 }
+        $dailyAgg[$todayKey][$key].sent     += $sent
+        $dailyAgg[$todayKey][$key].received += $received
+        $dailyAgg[$todayKey][$key].msSum    += $msAdd
+    }
+
+    # 修剪到最近 30 天
+    $cutoff30 = $now.AddDays(-29).ToString('yyyy-MM-dd')
+    $oldKeys = @($dailyAgg.Keys | Where-Object { $_ -lt $cutoff30 })
+    foreach ($k in $oldKeys) { [void]$dailyAgg.Remove($k) }
+
+    # 計算近 7 日 SLA
+    $cutoff7 = $now.AddDays(-6).ToString('yyyy-MM-dd')
+    $slaRollup = @{}
+    foreach ($date in $dailyAgg.Keys) {
+        if ($date -lt $cutoff7) { continue }
+        foreach ($key in $dailyAgg[$date].Keys) {
+            if (-not $slaRollup.ContainsKey($key)) {
+                $slaRollup[$key] = @{ sent = 0; received = 0; msSum = 0.0 }
+            }
+            $slaRollup[$key].sent     += $dailyAgg[$date][$key].sent
+            $slaRollup[$key].received += $dailyAgg[$date][$key].received
+            $slaRollup[$key].msSum    += $dailyAgg[$date][$key].msSum
+        }
+    }
+
+    # 注入 sla7d 到每筆 result
+    foreach ($r in $resultsList) {
+        $key = "$($r.groupName)::$($r.name)"
+        if ($slaRollup.ContainsKey($key) -and $slaRollup[$key].sent -gt 0) {
+            $s = $slaRollup[$key]
+            $uptimePercent = [math]::Round($s.received / $s.sent * 100, 2)
+            $avgMs7d = if ($s.received -gt 0) { [math]::Round($s.msSum / $s.received, 2) } else { $null }
+            $r['sla7d'] = [ordered]@{
+                uptimePercent = $uptimePercent
+                avgMs         = $avgMs7d
+                sampleCount   = $s.sent
+            }
+        } else {
+            $r['sla7d'] = [ordered]@{
+                uptimePercent = $null
+                avgMs         = $null
+                sampleCount   = 0
+            }
+        }
+    }
+
+    # 存 daily.json
+    Write-JsonNoBom -Object @{ days = $dailyAgg } -Path $DailyFile
+    Write-Log "已更新 daily.json（7日 SLA 已計算）"
+
     $snapshot = [ordered]@{
         timestamp = $timestamp
         timeLabel = $timeLabel
@@ -183,7 +276,7 @@ try {
         $prevPref = $ErrorActionPreference
         $ErrorActionPreference = 'Continue'
 
-        & git add status.json history.json | Out-Null
+        & git add status.json history.json daily.json | Out-Null
         $statusOutput = (& git status --porcelain) -join "`n"
         if ([string]::IsNullOrWhiteSpace($statusOutput)) {
             Write-Log "沒有檔案變更，跳過 commit"
