@@ -349,8 +349,15 @@
 </div>
 
 <script>
-  /* ===== Theme ===== */
+  /* ===== Constants & state（必須先宣告，applyTheme 會用到 charts）===== */
   const THEME_KEY = 'ipconfig.theme';
+  const REFRESH_MS = 60 * 1000;
+  const COLOR_PALETTE = ['#5cb85c', '#5bc0de', '#f0ad4e', '#9b59b6', '#1abc9c', '#e67e22', '#3498db', '#e74c3c', '#2ecc71', '#16a085', '#d35400'];
+  let thresholds = { greenMaxMs: 100, yellowMaxMs: 300, yellowMaxLossPercent: 30 };
+  const charts = {}; // groupName -> Chart instance
+  let activeGroupTab = null;
+
+  /* ===== Theme ===== */
   const themeBtn = document.getElementById('themeBtn');
   function applyTheme(t) {
     document.documentElement.dataset.theme = t;
@@ -369,13 +376,6 @@
     const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
     applyTheme(next);
   });
-
-  /* ===== Constants & state ===== */
-  const REFRESH_MS = 60 * 1000;
-  let thresholds = { greenMaxMs: 100, yellowMaxMs: 300, yellowMaxLossPercent: 30 };
-  const charts = {}; // groupName -> Chart instance
-  let activeGroupTab = null;
-  const COLOR_PALETTE = ['#5cb85c', '#5bc0de', '#f0ad4e', '#9b59b6', '#1abc9c', '#e67e22', '#3498db', '#e74c3c', '#2ecc71', '#16a085', '#d35400'];
 
   /* ===== Helpers ===== */
   function classify(entry) {
