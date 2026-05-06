@@ -1,0 +1,65 @@
+name: Daily Report (Gemini AI 日報)
+
+# 每天 09:00 UTC = 17:00 Asia/Taipei
+# 讀 daily.json 昨日資料 → 餵 Gemini 寫摘要 → 產 reports/YYYY-MM-DD.html
+#
+# 必要 GitHub Secret：
+#   GEMINI_API_KEY  (到 https://aistudio.google.com/apikey 取免費 key)
+on:
+  schedule:
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate report
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-2.5-flash' }}
+        run: node scripts/daily-report.mjs
+
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          for i in 1 2 3; do
+            git fetch origin main
+            if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+              git reset --soft origin/main
+            fi
+
+            git add reports/
+
+            if git diff --cached --quiet; then
+              echo "No new report to commit"
+              exit 0
+            fi
+
+            git commit -m "report: $(date -u '+%Y-%m-%d') daily summary [skip ci]"
+
+            if git push; then
+              echo "Pushed on attempt $i"
+              exit 0
+            fi
+
+            sleep $((i * 3))
+          done
+
+          echo "Push failed after 3 attempts"
+          exit 1
