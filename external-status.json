@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-05-06T08:03:47.330Z",
-  "timeLabel": "16:03:47",
+  "timestamp": "2026-05-06T08:12:10.072Z",
+  "timeLabel": "16:12:10",
   "source": "github-actions-runner",
   "note": "外部視角（GitHub Actions ubuntu runner）— 已排除內網 IP",
   "results": [
@@ -61,7 +61,7 @@
       "host": "https://www.google.com",
       "type": "http",
       "ok": true,
-      "avgMs": 97,
+      "avgMs": 71,
       "lossPercent": 0
     },
     {
@@ -71,7 +71,7 @@
       "host": "https://www.youtube.com",
       "type": "http",
       "ok": true,
-      "avgMs": 321,
+      "avgMs": 192,
       "lossPercent": 0
     },
     {
@@ -81,7 +81,7 @@
       "host": "https://wordwall.net",
       "type": "http",
       "ok": true,
-      "avgMs": 527,
+      "avgMs": 361,
       "lossPercent": 0
     },
     {
@@ -91,7 +91,7 @@
       "host": "https://line.me",
       "type": "http",
       "ok": true,
-      "avgMs": 689,
+      "avgMs": 827,
       "lossPercent": 0
     },
     {
