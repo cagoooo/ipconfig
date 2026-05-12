@@ -35,6 +35,13 @@ jobs:
 
       - name: Commit & push
         run: |
+          # daily-report.mjs 在「昨日沒有監控資料」時會 exit 0 但不建立 reports/
+          # 那不是錯誤，是合法跳過 — 不要被後面 git add 當成失敗
+          if [ ! -d reports ]; then
+            echo "reports/ 不存在（daily-report.mjs 跳過產出），無事可 commit"
+            exit 0
+          fi
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
