@@ -167,7 +167,7 @@ ${stats
 </table>
 
 <footer>
-  <a href="../">← 回儀表板</a> · <a href="./">所有日報</a> · Made with ❤️ by <a href="https://sites.google.com/mail2.smes.tyc.edu.tw/akai" target="_blank" rel="noopener">阿凱老師</a>
+  <a href="../">← 回儀表板</a> · <a href="./">所有日報</a> · Made with ❤️ by <a href="https://www.smes.tyc.edu.tw/modules/tadnews/page.php?ncsn=11&amp;nsn=16#a5" target="_blank" rel="noopener noreferrer">阿凱老師</a>
 </footer>
 </body>
 </html>`;
@@ -225,7 +225,7 @@ footer a { color: #c97a3e; text-decoration: none; font-weight: 600; }
 <h1>📚 所有日報</h1>
 <p style="color:#8a7c66;">${headline}</p>
 ${listOrPlaceholder}
-<footer><a href="../">← 回儀表板</a> · Made with ❤️ by <a href="https://sites.google.com/mail2.smes.tyc.edu.tw/akai" target="_blank" rel="noopener">阿凱老師</a></footer>
+<footer><a href="../">← 回儀表板</a> · Made with ❤️ by <a href="https://www.smes.tyc.edu.tw/modules/tadnews/page.php?ncsn=11&amp;nsn=16#a5" target="_blank" rel="noopener noreferrer">阿凱老師</a></footer>
 </body>
 </html>`;
 
