@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>所有日報 · 石門國小網路狀態儀表板</title>
+<style>
+body { font-family: "Segoe UI", "Microsoft JhengHei", sans-serif; max-width: 700px; margin: 0 auto; padding: 32px 20px; color: #4a3f2f; background: #f7f1e8; }
+h1 { font-size: 24px; }
+ul { list-style: none; padding: 0; }
+li { background: #fffdf8; margin: 8px 0; padding: 14px 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #ece2cf; }
+li a { color: #c97a3e; text-decoration: none; font-weight: 600; }
+li a:hover { text-decoration: underline; }
+.placeholder { background: #fffdf8; padding: 22px 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #ece2cf; line-height: 1.8; }
+.placeholder p { margin: 6px 0; }
+.placeholder code { background: #efe6d3; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+.placeholder a { color: #c97a3e; text-decoration: none; font-weight: 600; }
+.placeholder a:hover { text-decoration: underline; }
+footer { margin-top: 40px; text-align: center; color: #8a7c66; font-size: 13px; padding-top: 18px; border-top: 2px dashed #ece2cf; }
+footer a { color: #c97a3e; text-decoration: none; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>📚 所有日報</h1>
+<p style="color:#8a7c66;">每天 17:00 自動生成 · 目前尚未累積日報</p>
+<div class="placeholder">
+        <p>📭 目前還沒有日報。</p>
+        <p>校園網路監控資料由校內機器每 5 分鐘檢測一次，每天 17:00 (UTC+8) 自動彙整成一份日報。</p>
+        <p>如果這頁面持續沒有日報，代表校內 <code>monitor.ps1</code> 排程暫停，或剛剛才開始監控、資料還不滿一天。</p>
+        <p style="margin-top:18px;"><a href="../">← 先去主儀表板看即時狀態</a></p>
+      </div>
+<footer><a href="../">← 回儀表板</a> · Made with ❤️ by 阿凱老師</footer>
+</body>
+</html>
