@@ -2,19 +2,14 @@
 // - 讀 daily.json 取得昨日（UTC+8）每個目標的可用率與平均延遲
 // - 餵給 Gemini API 寫一段給校長 / 主任看的人話摘要
 // - 輸出 reports/YYYY-MM-DD.html（單檔 HTML，可直接在 GitHub Pages 開）
-// - 更新 reports/index.html 列出所有日報
+// - 永遠更新 reports/index.html 列出所有日報（沒昨日資料時也會寫一份禮貌的著陸頁）
 //
 // 必要環境變數：
-//   GEMINI_API_KEY  — Google AI Studio 取得（免費層）
+//   GEMINI_API_KEY  — Google AI Studio 取得（免費層）；只有「真的要產 AI 日報」時才需要
 //   GEMINI_MODEL    — 可選，預設 gemini-2.5-flash
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-  console.error('❌ GEMINI_API_KEY 未設定，請到 GitHub repo Settings → Secrets 加入');
-  process.exit(1);
-}
 const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
 const escapeHtml = (s) =>
@@ -22,23 +17,35 @@ const escapeHtml = (s) =>
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[c]));
 
-// ----- 讀資料 -----
-if (!existsSync('daily.json')) {
-  console.error('找不到 daily.json — 校內 monitor.ps1 還沒跑過嗎？');
-  process.exit(0);
-}
-const daily = JSON.parse(readFileSync('daily.json', 'utf8'));
-const config = JSON.parse(readFileSync('targets.json', 'utf8'));
+const config = existsSync('targets.json')
+  ? JSON.parse(readFileSync('targets.json', 'utf8'))
+  : { title: '網路狀態' };
 
-// 計算「昨日」(UTC+8)
+// 先確保 reports/ 存在 — 即使最後沒新日報，也要更新 index 著陸頁
+if (!existsSync('reports')) mkdirSync('reports', { recursive: true });
+
+// ----- 找昨日資料 -----
 const tw = new Date(Date.now() + 8 * 3600 * 1000);
 const yesterdayTw = new Date(tw.getTime() - 24 * 3600 * 1000);
 const yKey = yesterdayTw.toISOString().slice(0, 10);
 
+const daily = existsSync('daily.json')
+  ? JSON.parse(readFileSync('daily.json', 'utf8'))
+  : { days: {} };
 const yesterdayBucket = daily.days?.[yKey];
-if (!yesterdayBucket || Object.keys(yesterdayBucket).length === 0) {
-  console.log(`昨日 (${yKey}) 沒有監控資料，跳過日報生成`);
+const hasYesterdayData = yesterdayBucket && Object.keys(yesterdayBucket).length > 0;
+
+if (!hasYesterdayData) {
+  console.log(`昨日 (${yKey}) 沒有監控資料，僅刷新 reports/index.html 著陸頁`);
+  writeReportsIndex();
   process.exit(0);
+}
+
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+  console.error('❌ GEMINI_API_KEY 未設定 — 有昨日資料但無法呼叫 Gemini 產日報');
+  writeReportsIndex();
+  process.exit(1);
 }
 
 // ----- 整理統計 -----
@@ -165,17 +172,34 @@ ${stats
 </body>
 </html>`;
 
-if (!existsSync('reports')) mkdirSync('reports', { recursive: true });
 writeFileSync(`reports/${yKey}.html`, reportHtml);
 console.log(`✓ 寫入 reports/${yKey}.html`);
 
-// ----- 更新 reports/index.html（列出全部日報） -----
-const reportFiles = readdirSync('reports')
-  .filter((f) => /^\d{4}-\d{2}-\d{2}\.html$/.test(f))
-  .sort()
-  .reverse();
+writeReportsIndex();
 
-const indexHtml = `<!DOCTYPE html>
+// ----- 著陸頁產生器（不論有無新日報都會寫） -----
+function writeReportsIndex() {
+  const reportFiles = existsSync('reports')
+    ? readdirSync('reports')
+        .filter((f) => /^\d{4}-\d{2}-\d{2}\.html$/.test(f))
+        .sort()
+        .reverse()
+    : [];
+
+  const listOrPlaceholder = reportFiles.length > 0
+    ? `<ul>\n${reportFiles.map((f) => `<li>📋 <a href="${f}">${f.replace('.html', '')}</a></li>`).join('\n')}\n</ul>`
+    : `<div class="placeholder">
+        <p>📭 目前還沒有日報。</p>
+        <p>校園網路監控資料由校內機器每 5 分鐘檢測一次，每天 17:00 (UTC+8) 自動彙整成一份日報。</p>
+        <p>如果這頁面持續沒有日報，代表校內 <code>monitor.ps1</code> 排程暫停，或剛剛才開始監控、資料還不滿一天。</p>
+        <p style="margin-top:18px;"><a href="../">← 先去主儀表板看即時狀態</a></p>
+      </div>`;
+
+  const headline = reportFiles.length > 0
+    ? `每天 17:00 由 Gemini AI 自動生成 · 共 ${reportFiles.length} 份`
+    : `每天 17:00 自動生成 · 目前尚未累積日報`;
+
+  const indexHtml = `<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
@@ -188,19 +212,23 @@ ul { list-style: none; padding: 0; }
 li { background: #fffdf8; margin: 8px 0; padding: 14px 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #ece2cf; }
 li a { color: #c97a3e; text-decoration: none; font-weight: 600; }
 li a:hover { text-decoration: underline; }
+.placeholder { background: #fffdf8; padding: 22px 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #ece2cf; line-height: 1.8; }
+.placeholder p { margin: 6px 0; }
+.placeholder code { background: #efe6d3; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+.placeholder a { color: #c97a3e; text-decoration: none; font-weight: 600; }
+.placeholder a:hover { text-decoration: underline; }
 footer { margin-top: 40px; text-align: center; color: #8a7c66; font-size: 13px; padding-top: 18px; border-top: 2px dashed #ece2cf; }
 footer a { color: #c97a3e; text-decoration: none; font-weight: 600; }
 </style>
 </head>
 <body>
 <h1>📚 所有日報</h1>
-<p style="color:#8a7c66;">每天 17:00 由 Gemini AI 自動生成 · 共 ${reportFiles.length} 份</p>
-<ul>
-${reportFiles.map((f) => `<li>📋 <a href="${f}">${f.replace('.html', '')}</a></li>`).join('\n')}
-</ul>
+<p style="color:#8a7c66;">${headline}</p>
+${listOrPlaceholder}
 <footer><a href="../">← 回儀表板</a> · Made with ❤️ by 阿凱老師</footer>
 </body>
 </html>`;
 
-writeFileSync('reports/index.html', indexHtml);
-console.log(`✓ 更新 reports/index.html（共 ${reportFiles.length} 份日報）`);
+  writeFileSync('reports/index.html', indexHtml);
+  console.log(`✓ 更新 reports/index.html（共 ${reportFiles.length} 份日報）`);
+}
