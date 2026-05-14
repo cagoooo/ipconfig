@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-05-14T08:47:35.971Z",
-  "timeLabel": "16:47:35",
+  "timestamp": "2026-05-14T11:19:04.333Z",
+  "timeLabel": "19:19:04",
   "source": "github-actions-runner",
   "note": "外部視角（GitHub Actions ubuntu runner）— 已排除內網 IP；ping 類型用 TCP 連線探測（port 443/80/53），不是 ICMP",
   "results": [
@@ -11,7 +11,7 @@
       "host": "8.8.8.8",
       "type": "ping",
       "ok": true,
-      "avgMs": 7,
+      "avgMs": 2,
       "lossPercent": 0,
       "probeViaPort": 53
     },
@@ -22,7 +22,7 @@
       "host": "1.1.1.1",
       "type": "ping",
       "ok": true,
-      "avgMs": 6,
+      "avgMs": 9,
       "lossPercent": 0,
       "probeViaPort": 53
     },
@@ -33,9 +33,9 @@
       "host": "168.95.1.1",
       "type": "ping",
       "ok": true,
-      "avgMs": 247,
+      "avgMs": 139,
       "lossPercent": 0,
-      "probeViaPort": 443
+      "probeViaPort": 53
     },
     {
       "groupName": "Internet",
@@ -44,7 +44,7 @@
       "host": "168.95.192.1",
       "type": "ping",
       "ok": true,
-      "avgMs": 242,
+      "avgMs": 139,
       "lossPercent": 0,
       "probeViaPort": 53
     },
@@ -55,7 +55,7 @@
       "host": "142.250.204.35",
       "type": "ping",
       "ok": true,
-      "avgMs": 195,
+      "avgMs": 139,
       "lossPercent": 0,
       "probeViaPort": 443
     },
@@ -66,7 +66,7 @@
       "host": "https://www.google.com",
       "type": "http",
       "ok": true,
-      "avgMs": 42,
+      "avgMs": 47,
       "lossPercent": 0
     },
     {
@@ -76,7 +76,7 @@
       "host": "https://www.youtube.com",
       "type": "http",
       "ok": true,
-      "avgMs": 199,
+      "avgMs": 333,
       "lossPercent": 0
     },
     {
@@ -86,7 +86,7 @@
       "host": "https://wordwall.net",
       "type": "http",
       "ok": true,
-      "avgMs": 436,
+      "avgMs": 262,
       "lossPercent": 0
     },
     {
@@ -96,7 +96,7 @@
       "host": "https://line.me",
       "type": "http",
       "ok": true,
-      "avgMs": 1113,
+      "avgMs": 630,
       "lossPercent": 0
     },
     {
@@ -116,7 +116,7 @@
       "host": "tycg.cloudhr.tw",
       "type": "ping",
       "ok": true,
-      "avgMs": 545,
+      "avgMs": 345,
       "lossPercent": 0,
       "probeViaPort": 80
     }
