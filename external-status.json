@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-05-17T22:09:26.041Z",
-  "timeLabel": "06:09:26",
+  "timestamp": "2026-05-17T23:13:13.413Z",
+  "timeLabel": "07:13:13",
   "source": "github-actions-runner",
   "note": "外部視角（GitHub Actions ubuntu runner）— 已排除內網 IP；ping 類型用 TCP 連線探測（port 443/80/53），不是 ICMP",
   "results": [
@@ -22,7 +22,7 @@
       "host": "1.1.1.1",
       "type": "ping",
       "ok": true,
-      "avgMs": 3,
+      "avgMs": 2,
       "lossPercent": 0,
       "probeViaPort": 53
     },
@@ -33,7 +33,7 @@
       "host": "168.95.1.1",
       "type": "ping",
       "ok": true,
-      "avgMs": 173,
+      "avgMs": 176,
       "lossPercent": 0,
       "probeViaPort": 53
     },
@@ -44,7 +44,7 @@
       "host": "168.95.192.1",
       "type": "ping",
       "ok": true,
-      "avgMs": 176,
+      "avgMs": 178,
       "lossPercent": 0,
       "probeViaPort": 53
     },
@@ -55,7 +55,7 @@
       "host": "142.250.204.35",
       "type": "ping",
       "ok": true,
-      "avgMs": 176,
+      "avgMs": 180,
       "lossPercent": 0,
       "probeViaPort": 443
     },
@@ -76,7 +76,7 @@
       "host": "https://www.youtube.com",
       "type": "http",
       "ok": true,
-      "avgMs": 246,
+      "avgMs": 244,
       "lossPercent": 0
     },
     {
@@ -86,7 +86,7 @@
       "host": "https://wordwall.net",
       "type": "http",
       "ok": true,
-      "avgMs": 121,
+      "avgMs": 422,
       "lossPercent": 0
     },
     {
@@ -96,7 +96,7 @@
       "host": "https://line.me",
       "type": "http",
       "ok": true,
-      "avgMs": 796,
+      "avgMs": 1017,
       "lossPercent": 0
     },
     {
@@ -116,7 +116,7 @@
       "host": "tycg.cloudhr.tw",
       "type": "ping",
       "ok": true,
-      "avgMs": 382,
+      "avgMs": 393,
       "lossPercent": 0,
       "probeViaPort": 80
     }
