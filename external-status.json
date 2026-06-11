@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-06-11T04:54:09.784Z",
-  "timeLabel": "12:54:09",
+  "timestamp": "2026-06-11T09:16:58.000Z",
+  "timeLabel": "17:16:58",
   "source": "github-actions-runner",
   "note": "外部視角（GitHub Actions ubuntu runner）— 已排除內網 IP；ping 類型用 TCP 連線探測（port 443/80/53），不是 ICMP",
   "results": [
@@ -11,7 +11,7 @@
       "host": "8.8.8.8",
       "type": "ping",
       "ok": true,
-      "avgMs": 2,
+      "avgMs": 8,
       "lossPercent": 0,
       "probeViaPort": 53
     },
@@ -22,7 +22,7 @@
       "host": "1.1.1.1",
       "type": "ping",
       "ok": true,
-      "avgMs": 2,
+      "avgMs": 9,
       "lossPercent": 0,
       "probeViaPort": 53
     },
@@ -33,7 +33,7 @@
       "host": "168.95.1.1",
       "type": "ping",
       "ok": true,
-      "avgMs": 136,
+      "avgMs": 139,
       "lossPercent": 0,
       "probeViaPort": 53
     },
@@ -44,7 +44,7 @@
       "host": "168.95.192.1",
       "type": "ping",
       "ok": true,
-      "avgMs": 137,
+      "avgMs": 143,
       "lossPercent": 0,
       "probeViaPort": 53
     },
@@ -55,7 +55,7 @@
       "host": "142.250.204.35",
       "type": "ping",
       "ok": true,
-      "avgMs": 136,
+      "avgMs": 143,
       "lossPercent": 0,
       "probeViaPort": 443
     },
@@ -66,7 +66,7 @@
       "host": "https://www.google.com",
       "type": "http",
       "ok": true,
-      "avgMs": 135,
+      "avgMs": 52,
       "lossPercent": 0
     },
     {
@@ -76,7 +76,7 @@
       "host": "https://www.youtube.com",
       "type": "http",
       "ok": true,
-      "avgMs": 352,
+      "avgMs": 349,
       "lossPercent": 0
     },
     {
@@ -86,7 +86,7 @@
       "host": "https://wordwall.net",
       "type": "http",
       "ok": true,
-      "avgMs": 160,
+      "avgMs": 238,
       "lossPercent": 0
     },
     {
@@ -96,7 +96,7 @@
       "host": "https://line.me",
       "type": "http",
       "ok": true,
-      "avgMs": 634,
+      "avgMs": 809,
       "lossPercent": 0
     },
     {
@@ -116,7 +116,7 @@
       "host": "tycg.cloudhr.tw",
       "type": "ping",
       "ok": true,
-      "avgMs": 358,
+      "avgMs": 158,
       "lossPercent": 0,
       "probeViaPort": 80
     }
