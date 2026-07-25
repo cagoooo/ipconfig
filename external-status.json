@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-07-25T06:24:39.864Z",
-  "timeLabel": "14:24:39",
+  "timestamp": "2026-07-25T08:31:43.712Z",
+  "timeLabel": "16:31:43",
   "source": "github-actions-runner",
   "note": "外部視角（GitHub Actions ubuntu runner）— 已排除內網 IP；ping 類型用 TCP 連線探測（port 443/80/53），不是 ICMP",
   "results": [
@@ -66,7 +66,7 @@
       "host": "https://www.google.com",
       "type": "http",
       "ok": true,
-      "avgMs": 95,
+      "avgMs": 99,
       "lossPercent": 0
     },
     {
@@ -86,7 +86,7 @@
       "host": "https://wordwall.net",
       "type": "http",
       "ok": true,
-      "avgMs": 86,
+      "avgMs": 164,
       "lossPercent": 0
     },
     {
@@ -96,7 +96,7 @@
       "host": "https://line.me",
       "type": "http",
       "ok": true,
-      "avgMs": 906,
+      "avgMs": 821,
       "lossPercent": 0
     },
     {
@@ -116,7 +116,7 @@
       "host": "tycg.cloudhr.tw",
       "type": "ping",
       "ok": true,
-      "avgMs": 485,
+      "avgMs": 418,
       "lossPercent": 0,
       "probeViaPort": 80
     }
