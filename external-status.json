@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-08-15T09:31:39.331Z",
-  "timeLabel": "17:31:39",
+  "timestamp": "2026-08-15T10:00:03.874Z",
+  "timeLabel": "18:00:03",
   "source": "github-actions-runner",
   "note": "外部視角（GitHub Actions ubuntu runner）— 已排除內網 IP；ping 類型用 TCP 連線探測（port 443/80/53），不是 ICMP",
   "results": [
@@ -33,7 +33,7 @@
       "host": "168.95.1.1",
       "type": "ping",
       "ok": true,
-      "avgMs": 188,
+      "avgMs": 190,
       "lossPercent": 0,
       "probeViaPort": 53
     },
@@ -66,7 +66,7 @@
       "host": "https://www.google.com",
       "type": "http",
       "ok": true,
-      "avgMs": 115,
+      "avgMs": 44,
       "lossPercent": 0
     },
     {
@@ -76,7 +76,7 @@
       "host": "https://www.youtube.com",
       "type": "http",
       "ok": true,
-      "avgMs": 220,
+      "avgMs": 267,
       "lossPercent": 0
     },
     {
@@ -86,7 +86,7 @@
       "host": "https://wordwall.net",
       "type": "http",
       "ok": true,
-      "avgMs": 87,
+      "avgMs": 102,
       "lossPercent": 0
     },
     {
@@ -96,7 +96,7 @@
       "host": "https://line.me",
       "type": "http",
       "ok": true,
-      "avgMs": 821,
+      "avgMs": 941,
       "lossPercent": 0
     },
     {
@@ -116,7 +116,7 @@
       "host": "tycg.cloudhr.tw",
       "type": "ping",
       "ok": true,
-      "avgMs": 422,
+      "avgMs": 418,
       "lossPercent": 0,
       "probeViaPort": 80
     }
