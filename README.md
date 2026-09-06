@@ -3,6 +3,8 @@
 > **Windows 校內主機 + GitHub Pages + GitHub Actions** 混合架構的校園網路即時監控系統。
 > 從「顯示器」進化成「主動監控 + AI 日報 + LINE 告警」的資訊處戰情中樞。
 
+> 🗂️ **一次性專案**：自動化資料 repo，提交幾乎都由機器產生，沒有人工發版概念，內容不再變動，因此不做版本管理。
+
 🌐 **線上儀表板**：<https://cagoooo.github.io/ipconfig/>
 📋 **每日日報**：<https://cagoooo.github.io/ipconfig/reports/>
 
