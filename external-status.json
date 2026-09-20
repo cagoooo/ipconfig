@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-20T00:18:49.450Z",
-  "timeLabel": "08:18:49",
+  "timestamp": "2026-09-20T05:17:23.438Z",
+  "timeLabel": "13:17:23",
   "source": "github-actions-runner",
   "note": "外部視角（GitHub Actions ubuntu runner）— 已排除內網 IP；ping 類型用 TCP 連線探測（port 443/80/53），不是 ICMP",
   "results": [
@@ -11,7 +11,7 @@
       "host": "8.8.8.8",
       "type": "ping",
       "ok": true,
-      "avgMs": 4,
+      "avgMs": 3,
       "lossPercent": 0,
       "probeViaPort": 53
     },
@@ -22,7 +22,7 @@
       "host": "1.1.1.1",
       "type": "ping",
       "ok": true,
-      "avgMs": 9,
+      "avgMs": 15,
       "lossPercent": 0,
       "probeViaPort": 53
     },
@@ -33,7 +33,7 @@
       "host": "168.95.1.1",
       "type": "ping",
       "ok": true,
-      "avgMs": 139,
+      "avgMs": 145,
       "lossPercent": 0,
       "probeViaPort": 53
     },
@@ -55,7 +55,7 @@
       "host": "142.250.204.35",
       "type": "ping",
       "ok": true,
-      "avgMs": 138,
+      "avgMs": 139,
       "lossPercent": 0,
       "probeViaPort": 443
     },
@@ -66,7 +66,7 @@
       "host": "https://www.google.com",
       "type": "http",
       "ok": true,
-      "avgMs": 54,
+      "avgMs": 109,
       "lossPercent": 0
     },
     {
@@ -85,8 +85,8 @@
       "name": "Wordwall",
       "host": "https://wordwall.net",
       "type": "http",
-      "ok": true,
-      "avgMs": 147,
+      "ok": false,
+      "avgMs": 67,
       "lossPercent": 0
     },
     {
@@ -96,7 +96,7 @@
       "host": "https://line.me",
       "type": "http",
       "ok": true,
-      "avgMs": 646,
+      "avgMs": 705,
       "lossPercent": 0
     },
     {
@@ -116,7 +116,7 @@
       "host": "tycg.cloudhr.tw",
       "type": "ping",
       "ok": true,
-      "avgMs": 148,
+      "avgMs": 358,
       "lossPercent": 0,
       "probeViaPort": 80
     }
